@@ -36,7 +36,7 @@
             <!-- &nbsp;|&nbsp;   
             <a href="/Formulario">Fale comigo</a> -->
             &nbsp;|&nbsp;
-            <a href="/contatos.html" target="MeuIframe">Contatos</a>
+            <a href="/contatos.html" target="MeuIframe" onclick="scrollParaIframe()">Contatos</a>
             </div>
 
         <br> <br>
@@ -70,6 +70,7 @@
         <iframe
             src="/ProjetosInicial.html"
             name="MeuIframe"
+            id="iframe-contato"
             title="Contato"
             width="100%"
             height="700"
@@ -110,6 +111,18 @@
     </span>
 
     <br>
+
+    <!-- Script para rolar para o iframe de contato -->
+
+    <script>
+function scrollParaIframe() {
+    setTimeout(() => {
+        document
+            .getElementById("iframe-contato")
+            .scrollIntoView({ behavior: "smooth" });
+    }, 150);
+}
+</script>
 
     </body>
 </html>
