@@ -119,8 +119,8 @@ function scrollParaIframe() {
     setTimeout(() => {
         document
             .getElementById("iframe-contato")
-            .scrollIntoView({ behavior: "smooth" });
-    }, 150);
+            .scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 300);
 }
 </script>
 
