@@ -1,0 +1,8 @@
+{
+  "routes": [
+    {
+      "src": "/projetos",
+      "dest": "/Projetos.html"
+    }
+  ]
+}
