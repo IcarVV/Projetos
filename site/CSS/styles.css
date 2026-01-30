@@ -564,10 +564,14 @@ table {
 .navbar {
     position: relative;
     z-index: 1000;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 15px 30px;
   }
 
   .nav-toggle {
-    display: block;
+    display: flex;
     font-size: 26px;
     background: none;
     border: none;
@@ -578,9 +582,9 @@ table {
 
     .nav-links {
     position: absolute;
-    top: 100%;
+    top: 65px;
     left: 5%;
-    right: 5%;
+    right: 20px;
 
     width: auto;
     margin: 20px auto;
