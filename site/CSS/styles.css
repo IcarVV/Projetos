@@ -488,6 +488,11 @@ table {
   display: none;
 }
 
+.nav-links li:not(:last-child)::after {
+  content: "|";
+  margin-left: 20px;
+  color: #aaac9f;
+}
 
 /* =========================================================
    RESPONSIVO
@@ -617,6 +622,10 @@ table {
   .nav-links li a::after {
     display: none;
   }
+
+  .nav-links li:not(:last-child)::after {
+  content: none;
+}
 
 /* ===== TABELA RESPONSIVA ===== */
 
