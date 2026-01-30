@@ -571,7 +571,7 @@ table {
     font-size: 26px;
     background: none;
     border: none;
-    color: #fff;
+    color: #aaac9f;
     cursor: pointer;
     z-index: 1001;
   }
@@ -583,7 +583,7 @@ table {
     right: 5%;
 
     width: auto;
-    margin: 0 auto;
+    margin: 20px auto;
 
     transform: translateY(-10px);
 
