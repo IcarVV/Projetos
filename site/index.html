@@ -11,7 +11,7 @@
         <title>Portfólio Ícaro Viccario</title>
         <link rel="stylesheet" href="/CSS/styles.css">
         <link rel="icon" href="/img/Logo.ico" type="image/x-icon">
-
+        <script src="/JS/Nav.js" defer></script>
 
     </head>
 
@@ -28,16 +28,23 @@
         </div>   
 
                 <!-- Links Úteis -->
+        <nav class="navbar">
+            <div class="nav-logo">
 
-            <div class="menu">
-            <a href="https://www.linkedin.com/in/ícaro-viccario/" target="_blank">Linkedin</a>
-            &nbsp;|&nbsp;
-            <a href="/Projetos">Projetos Acadêmicos</a>
-            <!-- &nbsp;|&nbsp;   
-            <a href="/Formulario">Fale comigo</a> -->
-            &nbsp;|&nbsp;
-            <a href="/contatos.html" target="MeuIframe" onclick="scrollParaIframe()">Contatos</a>
+                <button class="nav-toggle" onclick="toggleMenu()">☰</button>
+
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="https://www.linkedin.com/in/ícaro-viccario/" target="_blank">Linkedin</a></li>
+                &nbsp;|&nbsp;
+                    <li><a href="/Projetos">Projetos Acadêmicos</a></li>
+                <!-- &nbsp;|&nbsp;   
+                    <a href="/Formulario">Fale comigo</a> -->
+                &nbsp;|&nbsp;
+                    <li><a href="/contatos.html" target="MeuIframe" onclick="scrollParaIframe()">Contatos</a></li>
+                </ul>
+
             </div>
+        </nav>
 
         <br> <br>
 
@@ -94,21 +101,19 @@
                 <th>Projetos em andamento</th>
                 <th>Projetos finalizados</th>
             </tr>
+            
             <tr>
-                <td>0</td>
-                <td>1</td>
-                <td>0</td>
+                <td data-label="Projetos realizados">0</td>
+                <td data-label="Projetos em andamento">1</td>
+                <td data-label="Projetos finalizados">0</td>
             </tr>
         </table>
 
 
-    <span class="direitos">
-        &copy; 2026 Ícaro Viccario - Todos os direitos reservados.
-    </span>
-
-    <span class="desenvolvedor">
-        Desenvolvido por Ícaro Viccario.
-    </span>
+    <footer class="footer">
+        <p>© 2026 Ícaro Viccario - Todos os direitos reservados.</p>
+        <p>Desenvolvido por Ícaro Viccario.</p>
+    </footer>
 
     <br>
 
