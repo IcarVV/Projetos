@@ -490,7 +490,7 @@ table {
 
 .nav-links li:not(:last-child)::after {
   content: "|";
-  margin-left: 20px;
+  margin-left: 30px;
   color: #aaac9f;
 }
 
