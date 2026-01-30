@@ -428,6 +428,16 @@ table {
   box-shadow: 0 8px 24px rgba(0,0,0,0.4);
 }
 
+.direitos,
+.desenvolvedor {
+
+  display: block;
+  text-align: center;
+  font-size: 14px;
+  color: #777;
+  margin-top: 8px;
+}
+
 
 /* =========================================================
    NAVBAR – DESKTOP (PADRÃO)

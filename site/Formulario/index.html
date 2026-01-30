@@ -16,13 +16,24 @@
   <h1>Portfólio Ícaro Viccario</h1>
 </div>
 
-<div class="menu">
-  <a href="/index.html">Home</a>
-    &nbsp;|&nbsp;
-  <a href="https://www.linkedin.com/in/ícaro-viccario/" target="_blank">Linkedin</a>
-    &nbsp;|&nbsp;
-  <a href="/Projetos">Projetos Acadêmicos</a>
- </div>
+  <nav class="navbar">
+    <div class="nav-logo">
+
+    <button class="nav-toggle" onclick="toggleMenu()">☰</button>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="/">Home</a></li>
+          &nbsp;|&nbsp;
+        <li><a href="https://www.linkedin.com/in/ícaro-viccario/" target="_blank">Linkedin</a></li>
+          &nbsp;|&nbsp;
+        <li><a href="/Projetos">Projetos Acadêmicos</a></li>
+          &nbsp;|&nbsp;
+        <li><a href="/contatos.html" target="MeuIframe" onclick="scrollParaIframe()">Contatos</a></li>
+      </ul>
+
+    </div>
+  </nav>
+ 
     <h2>FALE COMIGO</h2>
 
     <form method="post" action="php/formulario.php">
