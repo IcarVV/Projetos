@@ -372,13 +372,6 @@ ul {
   background-color: #111;
 }
 
-/* Destaque sutil nos números */
-.tabela-projetos td:nth-child(2) {
-  color: #b30000;
-  font-weight: bold;
-}
-
-
 /* =========================================================
    RODAPÉ
 ========================================================= */
