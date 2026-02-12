@@ -86,13 +86,31 @@ hr {
   gap: 15px;
 }
 
-.linguagens h2 {
-  margin-left: 300px;
+.listalinguagens {
   display: flex;
-  align-items: left;
+  text-align: center;
+  gap: 30px;
+  list-style: none;
+}
+
+.listalinguagens h2 {
   font-size: 22px;
   letter-spacing: 1px;
-  color: #aaac9f;
+  margin-bottom: 0px;
+}
+
+.listalinguagens li img {
+  width: 60px;
+  height: auto  ;
+  text-decoration: none;
+  font-size: 18px;
+  letter-spacing: 2px;
+  transition: 0.3s;
+}
+
+.listalinguagens li img:hover { 
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 5px #ffffff);
 }
 
 /* =========================================================
