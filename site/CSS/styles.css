@@ -86,22 +86,26 @@ hr {
   gap: 15px;
 }
 
-.listalinguagens {
+.linguagens {
   display: flex;
-  text-align: center;
-  gap: 30px;
-  list-style: none;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 40px;
 }
 
-.listalinguagens h2 {
-  font-size: 22px;
-  letter-spacing: 1px;
-  margin-bottom: 0px;
+
+.listalinguagens {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  list-style: none;
+  margin-top: 20px;
 }
 
 .listalinguagens li img {
+  
   width: 60px;
-  height: auto  ;
+  height: auto;
   text-decoration: none;
   font-size: 18px;
   letter-spacing: 2px;
@@ -110,7 +114,7 @@ hr {
 
 .listalinguagens li img:hover { 
   transform: scale(1.2);
-  filter: drop-shadow(0 0 5px #ffffff);
+  filter: drop-shadow(0 0 5px #464646);
 }
 
 /* =========================================================
@@ -138,6 +142,22 @@ iframe {
   max-width: 1000px;
   margin: 20px;
   padding: 10px;
+}
+
+.foto-curriculo {
+  overflow: hidden;
+  border-radius: 4px;
+  position: relative;
+}
+
+.foto-curriculo img {
+  border-radius: 4px;
+  filter: blur(3px);
+}
+
+.foto-curriculo img:hover {
+  transition: 0.3s;
+  filter: blur(0); 
 }
 
 /* =========================================================
