@@ -60,7 +60,7 @@ class FormSubmit {
 const formSubmit = new FormSubmit({
     form: '[data-form]',
     success: '<div class="voltar"><a href="/Formulario">_voltar</a></div>' + '<br>' + '<h1 class="success">Mensagem enviada com sucesso!</h1>',
-    error: '<div class="voltar"><a href="/Formulario">_voltar</a></div>' + '<br>' + '<h1 class="error">Não foi possível enviar a mensagem.</h1>'
+    error: '<div class="voltar"><a href="/Formulario">_voltar</a></div>' + '<br>' + '<h1 class="error">Não foi possível enviar a mensagem.</h1>',
 });
 
 formSubmit.init();
