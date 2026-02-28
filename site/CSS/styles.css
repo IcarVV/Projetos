@@ -239,6 +239,13 @@ form button[type="submit"]:disabled {
   text-align: center;
 }
 
+.voltar {
+  text-align: center;
+  margin-top: 20px;
+  color: #aaac9f;
+  text-decoration: none;
+}
+
 .error {
   background-color: #dc3545;
   color: #fff;
