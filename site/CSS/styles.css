@@ -245,6 +245,7 @@ form button[type="submit"]:disabled {
   font-size: 16px;
   letter-spacing: 2px;
   text-align: right;
+  display: block;
 }
 
 .error {
