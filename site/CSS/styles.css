@@ -243,8 +243,8 @@ form button[type="submit"]:disabled {
 .voltar {
   text-align: right;
   position: absolute;
-  right: 20px;
-  top: 5px;
+  right: 15px;
+  top: 15px;
   text-decoration: none;
 }
 
@@ -482,20 +482,16 @@ table {
   border-collapse: collapse;
 }
 
-.voltar {
+.voltarHome {
   text-align: center;
   margin: 30px 0;
 }
 
-.voltar a {
+.voltarHome a {
   color: #aaac9f;
   text-decoration: none;
   font-size: 16px;
   letter-spacing: 2px;
-}
-
-.voltar a:hover {
-  text-decoration: underline;
 }
 
 .footer {
@@ -583,6 +579,10 @@ table {
   content: "|";
   margin-left: 30px;
   color: #aaac9f;
+}
+
+.nav-links a.active {
+  color: #b30000;
 }
 
 /* =========================================================

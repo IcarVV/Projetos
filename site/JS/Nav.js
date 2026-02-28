@@ -26,3 +26,21 @@ if (valor !== '0' && valor !== '') {
         td.style.fontWeight = 'bold';
     }
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  const links = document.querySelectorAll(".nav-links a");
+
+  // remove index.html e barra final
+  const normalize = (path) =>
+    path.replace("index.html", "").replace(/\/$/, "");
+
+  const currentPath = normalize(window.location.pathname);
+
+  links.forEach(link => {
+    const linkPath = normalize(new URL(link.href).pathname);
+
+    if (currentPath === linkPath) {
+      link.classList.add("active");
+    }
+  });
+});
