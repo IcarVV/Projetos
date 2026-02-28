@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/CSS/styles.css">
     <script src="/JS/Nav.js" defer></script>
+    <script src="/JS/formulario.js" defer></script>
     <meta name=description content="Portfólio Ícaro Viccario - Armazenamento de projetos e trabalhos acadêmicos.">
     <meta name="keywords" content="Portfólio, Projetos, Trabalhos acadêmicos, Faculdade">
     <meta name="author" content="Ícaro Viccario">
@@ -26,7 +27,6 @@
         <li><a href="/">Home</a></li> 
         <li><a href="https://www.linkedin.com/in/ícaro-viccario/" target="_blank">Linkedin</a></li>
         <li><a href="/Projetos">Projetos Acadêmicos</a></li>
-        <!-- <li><a href="/contatos.html" target="MeuIframe" onclick="scrollParaIframe()">Contatos</a></li> -->
       </ul>
 
     </div>
@@ -34,21 +34,26 @@
  
     <h2>FALE COMIGO</h2>
 
-    <form method="post" action="php/formulario.php">
+    <form 
+      method="post" 
+      action="https://formsubmit.co/icaroaviccario@gmail.com"
+      data-form
+    >
 
         <!-- Campos do formulário -->
-        <label for="Nome">Nome</label><br>
+        <label for="Nome">Nome</label>
         <input id="Nome" name="Nome" type="text" autocomplete="off" placeholder="Digite seu nome" required><br><br>
 
         <!-- Campo de email -->
-        <label for="Email">E-mail</label><br>
+        <label for="Email">E-mail</label>
         <input id="Email" name="Email" type="email" autocomplete="off" placeholder="Digite seu email" required><br><br>
+
         <!-- Campo de mensagem -->
-        <label for="Mensagem">Mensagem</label><br>
+        <label for="Mensagem">Mensagem</label>
         <textarea id="Mensagem" name="Mensagem" rows="3" cols="50" placeholder="Digite sua mensagem"></textarea><br><br>
 
         <!-- Botão de envio -->
-        <input type="submit" value="Enviar proposta">
+        <button type="submit" data-button>Enviar</button>
 
     </Form>
     <span class="direitos">
