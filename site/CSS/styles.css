@@ -240,10 +240,12 @@ form button[type="submit"]:disabled {
 }
 
 .voltar {
-  text-align: center;
   margin-top: 20px;
   color: #aaac9f;
   text-decoration: none;
+  font-size: 16px;
+  letter-spacing: 2px;
+  text-align: right;
 }
 
 .error {
