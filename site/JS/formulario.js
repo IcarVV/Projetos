@@ -42,6 +42,12 @@ class FormSubmit {
         event.preventDefault();
 
         const button = this.form.querySelector('[data-button]');
+
+        if (!this.form.checkValidity()) {
+            this.form.reportValidity();
+            return;
+        }
+
         button.disabled = true;
         button.innerText = 'Enviando...';
 
