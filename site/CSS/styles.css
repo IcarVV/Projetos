@@ -553,6 +553,7 @@ table {
 
 .nav-links li a {
   position: relative;
+  font-weight: bold;
   color: #aaac9f;
   text-decoration: none;
   font-size: 18px;
