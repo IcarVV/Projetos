@@ -553,7 +553,6 @@ table {
 
 .nav-links li a {
   position: relative;
-  font-weight: bold;
   color: #aaac9f;
   text-decoration: none;
   font-size: 18px;
@@ -567,14 +566,11 @@ table {
 
 .nav-links li a::after {
   content: "↘";
+  color: #b30000;
   position: absolute;
   right: -22px;
-  opacity: 0;
-  transition: 0.3s;
-}
-
-.nav-links li a:hover::after {
   opacity: 1;
+  transition: 0.3s;
 }
 
 /* botão hambúrguer NÃO aparece no desktop */
