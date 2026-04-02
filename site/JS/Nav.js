@@ -27,6 +27,8 @@ if (valor !== '0' && valor !== '') {
     }
 });
 
+// Destaca o link ativo na navegação
+
 document.addEventListener("DOMContentLoaded", () => {
   const links = document.querySelectorAll(".nav-links a");
 
