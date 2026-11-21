@@ -598,6 +598,7 @@ table {
   position: relative;
   color: #aaac9f;
   text-decoration: none;
+  font-family: 'BodoniXT', 'Times New Roman', serif;
   font-size: 18px;
   letter-spacing: 2px;
   transition: 0.3s;
@@ -758,7 +759,6 @@ table {
 
   .nav-links li a {
     font-size: 18px;
-    font-family: 'Bodoni XT', serif;
   }
 
   .nav-links li a::after {
