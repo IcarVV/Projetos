@@ -15,7 +15,7 @@ html {
 }
 
 body {
-  font-family: 'Times New Roman', serif;
+  font-family: 'Archivo-Regular', serif;
   background: radial-gradient(circle at center, #1a1a1a 0%, #000 70%);
   color: #aaac9f;
   line-height: 1.6;
@@ -28,10 +28,6 @@ body {
 p {
   font-size: 18px;
   color: #aaac9f;
-}
-
-h1 {
-  font-family: 'TurismoCF-Heavy', sans-serif;
 }
 
 h1, h2 {
@@ -62,8 +58,8 @@ hr {
 }
 
 @font-face {
-    font-family: 'TurismoCF-Heavy';
-    src: url('/fonts/TurismoCF-Heavy.woff2') format('woff2');
+    font-family: 'Archivo-Regular';
+    src: url('/fonts/Archivo-Regular.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
