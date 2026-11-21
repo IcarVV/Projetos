@@ -758,6 +758,7 @@ table {
 
   .nav-links li a {
     font-size: 18px;
+    font-family: 'Bodoni XT', serif;
   }
 
   .nav-links li a::after {
