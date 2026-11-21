@@ -464,6 +464,287 @@ ul {
    TABELA DE PROJETOS
 ========================================================= */
 
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0.08;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+.grade-projetos {
+  max-width: 1100px;
+  margin: 30px auto 60px;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 24px;
+}
+
+.bloco-projeto {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  background: linear-gradient(to bottom, #0f0f0f, #000);
+  border: 1px solid #222;
+  border-left: 4px solid #b30000;
+  color: #aaac9f;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.bloco-projeto:hover,
+.bloco-projeto:focus-visible {
+  border-left-color: #ff1a1a;
+  background: #000;
+  transform: translateY(-3px);
+  outline: none;
+}
+
+.bloco-indice {
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: #777;
+}
+
+/* troque o texto por <img src="..."> quando tiver o print */
+.bloco-capa {
+  aspect-ratio: 16 / 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #222;
+  background: repeating-linear-gradient(135deg, #0a0a0a 0 12px, #111 12px 24px);
+  color: #555;
+  font-size: 13px;
+  letter-spacing: 2px;
+  overflow: hidden;
+}
+
+.bloco-capa img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: 0.3s;
+  filter: blur(3px);
+}
+
+.bloco-projeto:hover .bloco-capa img {
+  filter: none;
+}
+
+.bloco-titulo {
+  margin: 0;
+  font-size: 26px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #e5e5e5;
+}
+
+.bloco-status {
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #b30000;
+}
+
+.bloco-projeto p {
+  font-size: 16px;
+}
+
+.bloco-botao {
+  align-self: flex-start;
+  margin-top: auto;
+  padding: 10px 18px;
+  border: 1px solid #b30000;
+  letter-spacing: 2px;
+  font-size: 15px;
+  transition: 0.3s;
+}
+
+.bloco-botao::after {
+  content: " ↘";
+  color: #b30000;
+  transition: 0.3s;
+}
+
+.bloco-projeto:hover .bloco-botao {
+  background: #b30000;
+  color: #fff;
+}
+
+.bloco-projeto:hover .bloco-botao::after {
+  color: #fff;
+}
+
+.bloco-vazio {
+  opacity: 0.4;
+  pointer-events: none;
+  border-left-color: #333;
+}
+
+/* ---------- PÁGINA SIMPLIFICADA DO PROJETO ---------- */
+.projeto-pagina {
+  max-width: 900px;
+  margin: 40px auto 60px;
+  padding: 0 20px;
+}
+
+.projeto-pagina h1 {
+  text-align: left;
+  margin-top: 10px;
+  font-size: 44px;
+  text-transform: uppercase;
+}
+
+.projeto-pagina h2 {
+  text-align: left;
+  font-size: 22px;
+  margin: 50px 0 15px;
+  padding-top: 20px;
+  border-top: 1px solid #222;
+}
+
+.projeto-voltar {
+  display: inline-block;
+  color: #aaac9f;
+  text-decoration: none;
+  letter-spacing: 2px;
+  font-size: 15px;
+}
+
+.projeto-voltar:hover {
+  color: #b30000;
+}
+
+.aviso-demo {
+  margin-top: 25px;
+  padding: 12px 16px;
+  border: 1px dashed #b30000;
+  font-size: 14px;
+  color: #777;
+}
+
+/* lista de funcionalidades no estilo "tracklist" */
+.tracklist {
+  margin: 0;
+  max-width: none;
+  counter-reset: faixa;
+}
+
+.tracklist li {
+  counter-increment: faixa;
+  padding: 12px 0;
+  border-bottom: 1px solid #222;
+  font-size: 18px;
+}
+
+.tracklist li::before {
+  content: counter(faixa, decimal-leading-zero);
+  display: inline-block;
+  width: 40px;
+  color: #b30000;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+/* tabelas com dados fictícios */
+.rolagem {
+  overflow-x: auto;
+}
+
+.tabela-demo {
+  margin: 10px 0 25px;
+  max-width: none;
+  font-size: 15px;
+}
+
+.tabela-demo th,
+.tabela-demo td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #222;
+  white-space: nowrap;
+}
+
+.tabela-demo th {
+  color: #e5e5e5;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+/* linha do tempo no formato da página LIVE do BMTH */
+.versoes {
+  margin: 0;
+  max-width: none;
+}
+
+.versoes li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  padding: 18px 0;
+  border-bottom: 1px solid #222;
+}
+
+.versoes strong {
+  display: block;
+  color: #e5e5e5;
+  letter-spacing: 2px;
+}
+
+.etiqueta {
+  padding: 8px 14px;
+  border: 1px solid #b30000;
+  font-size: 13px;
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+
+.etiqueta.planejado {
+  border-color: #333;
+  color: #777;
+}
+
+@media (max-width: 768px) {
+  .projeto-pagina h1 { 
+    font-size: 30px; 
+  }
+
+  .versoes li { 
+    flex-direction: column; 
+    align-items: flex-start; 
+  }
+
+  .grade-projetos { 
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0 12px;
+    gap: 16px;
+  }
+
+    .bloco-projeto {
+    min-width: 0px;
+    min-height: 10px;
+    padding: 14px;
+  }
+
+    .bloco-titulo {
+    font-size: 22px;
+    letter-spacing: 2px;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bloco-projeto, .bloco-capa img, .bloco-botao { transition: none; }
+}
+
 .tabela-projetos {
   width: 100%;
   max-width: 100%;
