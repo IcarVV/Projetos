@@ -30,6 +30,10 @@ p {
   color: #aaac9f;
 }
 
+h1 {
+  font-family: 'TurismoCF-Heavy', sans-serif;
+}
+
 h1, h2 {
   text-align: center;
   margin-top: 40px;
@@ -55,6 +59,14 @@ hr {
 ::-moz-selection { /* Firefox */
   background: #e5e5e5;
   color: #000;
+}
+
+@font-face {
+    font-family: 'TurismoCF-Heavy';
+    src: url('/fonts/TurismoCF-Heavy.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
 }
 
 /* =========================================================
