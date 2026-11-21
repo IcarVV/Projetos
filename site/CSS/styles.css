@@ -53,7 +53,7 @@ hr {
 }
 
 ::-moz-selection { /* Firefox */
-  background: #aaac9f;
+  background: #e5e5e5;
   color: #000;
 }
 
