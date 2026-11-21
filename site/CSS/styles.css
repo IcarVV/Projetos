@@ -309,6 +309,15 @@ form button[type="submit"]:disabled {
   text-align: center;
 }
 
+.bloco-projeto:active {
+  border-left-color: #ff1a1a;
+  background: #000;
+}
+
+.nav-links li a:active {
+  color: #b30000;
+}
+
 /* =========================================================
    LISTA DE MENSAGENS
 ========================================================= */
