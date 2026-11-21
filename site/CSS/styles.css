@@ -868,7 +868,6 @@ table {
   border-bottom: 1px solid #222;
 }
 
-
 .nav-links {
   display: flex;
   gap: 30px;
@@ -1091,4 +1090,10 @@ table {
     padding: 40px 20px;
   }
 
+}
+
+@media (min-width: 769px) {
+  .nav-links {
+    padding-right: 40px;
+  }
 }
