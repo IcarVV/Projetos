@@ -15,7 +15,7 @@ html {
 }
 
 body {
-  font-family: 'Archivo-Regular', serif;
+  font-family: 'Times New Roman', serif;
   background: radial-gradient(circle at center, #1a1a1a 0%, #000 70%);
   color: #aaac9f;
   line-height: 1.6;
@@ -63,6 +63,18 @@ hr {
     font-weight: normal;
     font-style: normal;
     font-display: swap;
+}
+
+@font-face {
+    font-family: 'BodoniXT';
+    src: url('/fonts/BodoniXT.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+h1 {
+  font-family: 'BodoniXT', serif;
 }
 
 /* =========================================================
