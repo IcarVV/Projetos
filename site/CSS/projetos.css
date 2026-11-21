@@ -248,8 +248,31 @@ body::before {
 }
 
 @media (max-width: 768px) {
-  .projeto-pagina h1 { font-size: 30px; }
-  .versoes li { flex-direction: column; align-items: flex-start; }
+  .projeto-pagina h1 { 
+    font-size: 30px; 
+  }
+
+  .versoes li { 
+    flex-direction: column; 
+    align-items: flex-start; 
+  }
+
+  .grade-projetos { 
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0 12px;
+    gap: 16px;
+  }
+
+    .bloco-projeto {
+    min-width: 0;
+    padding: 16px;
+  }
+
+    .bloco-titulo {
+    font-size: 22px;
+    letter-spacing: 2px;
+    overflow-wrap: anywhere;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
