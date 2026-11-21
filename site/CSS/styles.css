@@ -914,6 +914,127 @@ table {
   color: #b30000;
 }
 
+.galeria {
+  max-width: 1200px;
+  margin: 40px auto 60px;
+  padding: 0 20px;
+}
+
+/* =========================================================
+   Galeria
+========================================================= */
+
+.galeria h1 {
+  text-align: left;
+  margin-top: 10px;
+  font-size: 44px;
+  text-transform: uppercase;
+}
+
+.galeria-intro {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #777;
+}
+
+/* ---------- GRADE: 4 colunas, fotos quadradas ---------- */
+.grade-galeria {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.arte {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border: 1px solid #222;
+  /* fundo que aparece enquanto você não colocou a imagem */
+  background: repeating-linear-gradient(135deg, #0a0a0a 0 12px, #111 12px 24px);
+}
+
+.arte img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;          /* corta a imagem para caber no quadrado */
+  filter: grayscale(1);
+  transition: 0.3s;
+}
+
+.arte:hover img {
+  filter: none;
+}
+
+/* ---------- LEGENDA (aparece no hover) ---------- */
+.arte-legenda {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.92), rgba(0, 0, 0, 0.15) 65%, transparent);
+  opacity: 0;
+  transition: 0.3s;
+}
+
+.arte:hover .arte-legenda,
+.arte:focus-within .arte-legenda {
+  opacity: 1;
+}
+
+.arte-titulo {
+  font-size: 18px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #e5e5e5;
+}
+
+.arte-baixar {
+  padding: 8px 14px;
+  border: 1px solid #b30000;
+  color: #aaac9f;
+  text-decoration: none;
+  font-size: 14px;
+  letter-spacing: 2px;
+  transition: 0.3s;
+}
+
+.arte-baixar::after {
+  content: " ↘";
+  color: #b30000;
+  transition: 0.3s;
+}
+
+.arte-baixar:hover,
+.arte-baixar:focus-visible {
+  background: #b30000;
+  color: #fff;
+  outline: none;
+}
+
+.arte-baixar:hover::after,
+.arte-baixar:focus-visible::after {
+  color: #fff;
+}
+
+/* ---------- TELAS MENORES ---------- */
+@media (max-width: 1000px) {
+  .grade-galeria { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .galeria { padding: 0 12px; }
+  .galeria h1 { font-size: 30px; }
+  .grade-galeria { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .arte-titulo { font-size: 14px; letter-spacing: 1px; }
+  .arte-baixar { padding: 6px 10px; font-size: 12px; }
+}
+
 /* =========================================================
    RESPONSIVO
 ========================================================= */
