@@ -47,6 +47,16 @@ hr {
   -webkit-tap-highlight-color: transparent;
 }
 
+::selection {
+  background: #aaac9f;
+  color: #000;
+}
+
+::-moz-selection { /* Firefox */
+  background: #aaac9f;
+  color: #000;
+}
+
 /* =========================================================
    TOPO
 ========================================================= */
