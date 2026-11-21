@@ -264,7 +264,7 @@ body::before {
   }
 
     .bloco-projeto {
-    min-width: 0;
+    min-width: 10px;
     padding: 16px;
   }
 
