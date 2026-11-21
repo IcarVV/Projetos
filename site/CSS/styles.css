@@ -884,6 +884,7 @@ table {
   font-weight: 550;
   letter-spacing: 2px;
   transition: 0.3s;
+  white-space: nowrap;
 }
 
 .nav-links li a:hover {
