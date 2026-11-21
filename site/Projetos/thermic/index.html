@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/LogoThermic.ico" type="image/x-icon">
+<title>Thermic - Cronoanálise</title>
+
+<style>
+  :root{
+    --chapa:#e6e9ec;
+    --papel:#f7f8f9;
+    --aco:#800812;
+    --mut:#5b6672;
+    --linha:#c3cad1;
+    --azul:#25040a;
+    --brasa:#d23b1c;
+    --palha:#f3e3a6
+  }
+  
+  *{box-sizing:border-box}
+
+  body{
+    margin:0;background:var(--chapa);
+    color:var(--aco);
+    font:16px/1.4 Bahnschrift,"DIN Alternate","Segoe UI",system-ui,sans-serif
+  }
+
+  [hidden]{display:none!important}
+
+  header{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 20px;
+    background:var(--aco);
+    color:#fff
+  }
+
+  h1{
+    margin:0;
+    font-size:22px;
+    font-weight:600
+  }
+
+  h1 small{
+    font-weight:400;
+    opacity:.7;
+    margin-left:8px;
+    font-size:18px
+  }
+
+  .bar{display:flex;
+    gap:8px;
+    flex-wrap:wrap
+  }
+
+  header img{
+    background:#fff;
+    padding:4px 8px;
+    border-radius:2px
+  }
+
+  #rel{
+    align-self:center;
+    font-variant-numeric:tabular-nums
+  }
+
+  main{
+    max-width:1280px;
+    margin:0 auto;
+    padding:16px;
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    gap:20px
+  }
+
+  section{ 
+    background:var(--papel);
+    border-top:6px solid var(--azul);
+    padding:14px 16px 8px
+  }
+
+  h2{
+    margin:0 0 12px;
+    font-size:18px
+  }
+  
+  .form{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:12px;
+    align-items:end
+  }
+
+  label{
+    display:grid;
+    gap:2px;
+    font-size:13px;
+    color:var(--mut)
+  }
+
+  input,select,button,.btn{
+    font:inherit;
+    min-height:42px;
+    padding:6px 10px;
+    border:1px solid var(--linha);
+    border-radius:3px;
+    background:#fff;
+    color:var(--aco)
+  }
+  
+  button,.btn{
+    cursor:pointer;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center
+  }
+
+  .pri,.btn{
+    background:var(--azul);
+    border-color:var(--azul);
+    color:#fff;
+    font-weight:600
+  }
+
+  :focus-visible{
+    outline:3px solid var(--brasa);
+    outline-offset:1px
+  }
+
+  .scroll{
+    overflow-x:auto
+  }
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap
+  }
+
+  th,td{padding:6px 8px;
+    border-bottom:1px solid var(--linha);
+    text-align:left
+  }
+
+  th{
+    font-size:13px;
+    font-weight:500;
+    color:var(--mut)
+  }
+
+  td input{
+    min-height:36px;
+    padding:2px 6px
+  }
+
+  .x{border:0;
+    background:none;
+    color:var(--mut);
+    min-width:36px;
+    justify-content:center
+  }
+
+  .aberta td{
+    background:var(--palha)
+  }
+
+  .estouro td{
+    background:var(--brasa);
+    color:#fff;
+    font-weight:600
+  }
+
+  .estouro input,.estouro button{
+    color:var(--aco)
+  }
+
+  .dur{
+    font-size:20px;
+    font-weight:600
+  }
+
+  #aviso{
+    background:var(--brasa);
+    color:#fff;
+    padding:12px 16px;
+    font-weight:600
+  }
+
+  .vazio{
+    color:var(--mut);
+    padding:8px
+  }
+
+  #tot{font-size:14px;font-weight:500;color:var(--mut);margin-left:10px}
+
+  .seg{display:flex;margin-bottom:10px}
+  .seg button{border-radius:0}
+  .seg button[aria-pressed=true]{background:var(--azul);border-color:var(--azul);color:#fff;font-weight:600}
+  #gr .resumo{color:var(--mut);margin-bottom:6px}
+  #gr .lin{display:grid;grid-template-columns:minmax(120px,240px) 1fr auto;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--linha)}
+  #gr .lb{overflow-wrap:anywhere}
+  .barra{background:var(--chapa);height:22px}
+  .barra i{display:block;height:100%;background:var(--aco)}
+  .vl{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+  .vl small{font-weight:400;color:var(--mut)}
+
+  .lk{border:0;background:none;padding:0;min-height:0;color:var(--aco);font-weight:600;text-decoration:underline;text-align:left}
+  .estouro .lk{color:#fff}
+  dialog{width:min(720px,94vw);max-height:85vh;padding:0;border:0;border-top:6px solid var(--azul);background:var(--papel);color:var(--aco)}
+  dialog::backdrop{background:rgba(0,0,0,.5)}
+  .dc{padding:16px 20px}
+  .dc .sub{margin:0 0 10px;color:var(--mut)}
+  .dc .resumo{margin:8px 0 0;color:var(--mut)}
+  .dc .fecha{margin-top:14px}
+
+  @media(max-width:700px){
+
+    .scroll{
+      overflow:visible
+    }
+
+    table,tbody,tr,td{
+      display:block
+    }
+
+    .cab{
+      display:none
+    }
+
+    tr{
+      background:#fff;
+      border:1px solid var(--linha);
+      border-left:5px solid var(--azul);
+      margin-bottom:10px;
+      padding:4px 10px
+    }
+
+    tr.aberta{
+      background:var(--palha)
+    }
+
+    tr.estouro{
+      background:var(--brasa);
+      border-left-color:var(--aco)
+    }
+
+    td{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;border:0;
+      padding:5px 0
+    }
+
+    td[data-l]::before{
+      content:attr(data-l);
+      color:var(--mut);
+      font-size:14px
+    }
+
+    .estouro td[data-l]::before{
+      color:#fff
+    }
+
+    .aberta td,.estouro td{
+      background:none
+    }
+
+    td:last-child{
+      justify-content:flex-end
+    }
+
+    .form>*{
+      flex:1 1 140px
+    }
+
+    table{white-space:normal}
+    td.vazio{display:block}
+    td[data-l]{text-align:right}
+    td[data-l]::before{flex:none;text-align:left}
+
+    #gr .lin{grid-template-columns:1fr auto}
+    #gr .lb{grid-column:1}
+    #gr .vl{grid-column:2;grid-row:1}
+    #gr .barra{grid-column:1/-1;grid-row:2}
+    
+  }
+</style>
+
+</head>
+
+<body>
+  <header>
+    <img src="/logo" alt="Logo Thermic" height="48">
+    <h1>Thermic<small>Cronoanálise</small></h1>
+    <div class="bar"> <span id="rel"></span> <input type="date" id="dia" aria-label="Dia"> <a class="btn" id="exp">Exportar Excel</a> </div>
+  </header>
+  <main>
+    <div id="aviso" hidden></div>
+    <section>
+      <h2>Entrada e saída<span id="tot"></span></h2>
+      <div class="form">
+        <label>Operador<input id="nome" placeholder="Nome"></label>
+        <label>Processo<input id="proc" placeholder="Ex.: soldagem"></label>
+        <label>Hora manual (vazio = hora do PC)<input id="hent" type="time" step="1"></label>
+        <button class="pri" onclick="novoTurno()">Registrar entrada</button>
+      </div>
+      <div class="scroll"><table id="tt"></table></div>
+    </section>
+    <section>
+      <h2>Pausas</h2>
+      <div class="form">
+        <label>Operador<select id="pt"></select></label>
+        <label>OP / Peça<input id="pos" placeholder="Ex.: OP 1234"></label>
+        <label>Motivo<select id="pm" onchange="$('#po').hidden=this.value!=='Outro'"></select></label>
+        <label id="po" hidden>Qual motivo?<input id="pot"></label>
+        <label>Hora manual (vazio = hora do PC)<input id="phi" type="time" step="1"></label>
+        <button class="pri" onclick="novaPausa()">Abrir pausa</button>
+      </div>
+      <div class="scroll"><table id="tp"></table></div>
+    </section>
+    <section>
+      <h2>Resumo das pausas</h2>
+      <div class="seg">
+        <button id="g1" aria-pressed="true" onclick="gmod('motivo')">Por motivo</button>
+        <button id="g2" aria-pressed="false" onclick="gmod('nome')">Por operador</button>
+      </div>
+      <div id="gr"></div>
+    </section>
+  </main>
+  <dialog id="dlg"><div class="dc"><div id="dlgc"></div><button class="pri fecha" onclick="fechar()">Fechar</button></div></dialog>
+  <script>
+
+    const $=s=>document.querySelector(s), C=['entrada','saida_almoco','volta_almoco','saida_final'];
+    const L={entrada:'Entrada',saida_almoco:'Saída almoço',volta_almoco:'Volta almoço',saida_final:'Saída final'};
+    const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const fmt=s=>{const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return h+':'+String(m).padStart(2,'0')+':'+String(x).padStart(2,'0')};
+    const dia=()=>$('#dia').value;
+    let D,CK,T0=0,TICK=false,SIG='',AGR='motivo',ABERTO=null;
+    async function api(u,m='GET',b){
+      const r=await fetch(u,{method:m,headers:{'Content-Type':'application/json'},body:b&&JSON.stringify(b)});
+      if(!r.ok){alert(await r.text());throw 0}
+      return r.json();
+    }
+
+    const sig=d=>JSON.stringify([dia(),d.turnos.map(t=>[t.id,t.nome,t.processo,...C.map(c=>t[c])]),d.pausas.map(p=>[p.id,p.turno_id,p.os,p.inicio,p.fim,p.motivo])]);
+    async function load(poll){
+      const nd=await api('/api/dia?data='+dia());
+      CK={t:Date.now(),s:nd.agora.split(':').reduce((a,x)=>a*60+ +x,0)}; // relógio do PC (servidor)
+      if(!dia())$('#dia').value=nd.data;
+      const s=sig(nd);
+    
+      // só redesenha se algo mudou (em qualquer aparelho); os cronômetros andam sozinhos entre uma mudança e outra
+      if(s===SIG||(poll&&document.activeElement.matches('table input')))return;
+      SIG=s;D=nd;render();
+    }
+
+    const tk=(v,r,x='')=>`<span class="tick" data-s="${v}" data-r="${TICK?r:0}"${x}>${fmt(v)}</span>`;
+    const rt=t=>{const l=t.saida_final?0:1,a=t.saida_almoco&&!t.volta_almoco?l:0,o=D.pausas.filter(p=>p.turno_id===t.id&&!p.fim).length;return{pau:o,trab:l-a-o}};
+    function aviso(dt){
+      const lim=D.alerta_min*60,n=D.pausas.filter(p=>!p.fim&&p.dur+(TICK?dt:0)>=lim).map(p=>p.nome),av=$('#aviso');
+      av.hidden=!n.length;av.textContent='Pausa acima de '+D.alerta_min+' min: '+n.join(', ');
+    }
+
+    function relogio(){
+      const s=(CK.s+Math.floor((Date.now()-CK.t)/1000))%86400,p=x=>String(Math.floor(x)).padStart(2,'0');
+      $('#rel').textContent='Hora do PC '+p(s/3600)+':'+p(s%3600/60)+':'+p(s%60);
+    }
+
+    function tick(){
+      if(CK)relogio();
+      if(!D)return;
+      const dt=Math.floor((Date.now()-T0)/1000),lim=D.alerta_min*60;
+      document.querySelectorAll('.tick').forEach(e=>{
+        const v=Math.max(0,+e.dataset.s+e.dataset.r*dt);
+        e.textContent=fmt(v);
+        if(e.hasAttribute('data-open'))e.closest('tr').className=v>=lim?'estouro':'aberta';
+      });
+      aviso(dt);
+      if(TICK&&D.pausas.some(p=>!p.fim))grafico(dt);
+    }
+
+    function abrir(id){ABERTO=id;modal();$('#dlg').showModal()}
+    function fechar(){$('#dlg').close()}
+    function modal(){
+      const t=D.turnos.find(x=>x.id===ABERTO);
+      if(!t){fechar();return}
+      const ps=D.pausas.filter(p=>p.turno_id===t.id);
+      $('#dlgc').innerHTML=`<h2>Pausas de ${esc(t.nome)}</h2><p class="sub">${esc(t.processo)}, ${D.data.split('-').reverse().join('/')}</p>`
+        +(ps.length
+          ?`<div class="scroll"><table><tr class="cab"><th>Início</th><th>Fim</th><th>Duração</th><th>OP / peça</th><th>Motivo</th></tr>${ps.map(p=>`<tr class="${p.fim?'':'aberta'}"><td data-l="Início">${p.inicio}</td><td data-l="Fim">${p.fim||'em andamento'}</td><td class="dur" data-l="Duração">${p.fim?fmt(p.dur):tk(p.dur,1,' data-open')}</td><td data-l="OP / peça">${esc(p.os)}</td><td data-l="Motivo">${esc(p.motivo)}</td></tr>`).join('')}</table></div><p class="resumo">${ps.length} pausa${ps.length>1?'s':''}, ${tk(t.pau,rt(t).pau)} no total</p>`
+          :'<p class="vazio">Nenhuma pausa registrada neste dia.</p>');
+    }
+
+    function grafico(dt){
+      const g={};let ts=0,tn=0;
+      D.pausas.forEach(p=>{
+        const k=AGR==='motivo'?p.motivo:p.nome,d=p.dur+(!p.fim&&TICK?dt:0);
+        (g[k]=g[k]||{s:0,n:0}).s+=d;g[k].n++;ts+=d;tn++;
+      });
+      const li=Object.entries(g).sort((a,b)=>b[1].s-a[1].s),mx=li.length?li[0][1].s||1:1;
+      $('#gr').innerHTML=li.length
+        ?`<div class="resumo">${tn} pausa${tn>1?'s':''}, ${fmt(ts)} no total</div>`+li.map(([k,v])=>`<div class="lin"><span class="lb">${esc(k)}</span><span class="barra"><i style="width:${Math.max(2,v.s/mx*100)}%"></i></span><span class="vl">${fmt(v.s)} <small>(${v.n}x)</small></span></div>`).join('')
+        :'<div class="vazio">Nenhuma pausa neste dia.</div>';
+    }
+    function gmod(m){
+      AGR=m;
+      $('#g1').setAttribute('aria-pressed',m==='motivo');
+      $('#g2').setAttribute('aria-pressed',m==='nome');
+      if(D)grafico(Math.floor((Date.now()-T0)/1000));
+    }
+
+    function fill(s,h){if(s.dataset.h===h)return;const v=s.value;s.innerHTML=h;s.value=v;s.dataset.h=h}
+    const cel=(t,c)=>t[c]
+      ?`<input type="time" step="1" value="${t[c]}" onchange="setT(${t.id},'${c}',this.value)">`
+      :`<button onclick="setT(${t.id},'${c}')">Marcar</button>`;
+
+    function render(){
+      
+      T0=Date.now();TICK=dia()===D.hoje;
+      $('#tot').textContent='Total de pessoas: '+D.turnos.length;
+
+      $('#exp').href='/exportar?data='+dia();
+
+      $('#tt').innerHTML=D.turnos.length
+
+        ?'<tr class="cab"><th>Operador</th><th>Processo</th><th>Entrada</th><th>Saída almoço</th><th>Volta almoço</th><th>Saída final</th><th>Pausas</th><th>Trabalhado</th><th></th></tr>'
+          +D.turnos.map(t=>`<tr><td data-l="Operador"><button class="lk" title="Ver as pausas" onclick="abrir(${t.id})">${esc(t.nome)}</button></td><td data-l="Processo">${esc(t.processo)}</td>${C.map(c=>`<td data-l="${L[c]}">${cel(t,c)}</td>`).join('')}<td data-l="Pausas">${tk(t.pau,rt(t).pau)}</td><td data-l="Trabalhado"><b>${tk(t.trab,rt(t).trab)}</b></td><td><button class="x" title="Apagar" onclick="del('turno',${t.id})">✕</button></td></tr>`).join('')
+        :'<tr><td class="vazio">Nenhuma entrada neste dia. Preencha o operador e o processo acima.</td></tr>';
+      const lim=D.alerta_min*60;
+
+      $('#tp').innerHTML=D.pausas.length
+        ?'<tr class="cab"><th>Operador</th><th>Processo</th><th>OP / peça</th><th>Início</th><th>Fim</th><th>Duração</th><th>Motivo</th><th></th></tr>'
+          +[...D.pausas].sort((a,b)=>(a.fim?1:0)-(b.fim?1:0)).map(p=>`<tr class="${p.fim?'':p.dur>=lim?'estouro':'aberta'}"><td data-l="Operador"><button class="lk" title="Ver as pausas" onclick="abrir(${p.turno_id})">${esc(p.nome)}</button></td><td data-l="Processo">${esc(p.processo)}</td><td data-l="OP / peça">${esc(p.os)}</td><td data-l="Início"><input type="time" step="1" value="${p.inicio}" onchange="setP(${p.id},'inicio',this.value)"></td><td data-l="Fim">${p.fim?`<input type="time" step="1" value="${p.fim}" onchange="setP(${p.id},'fim',this.value)">`:`<button onclick="setP(${p.id},'fim')">Fechar pausa</button>`}</td><td class="dur" data-l="Duração">${p.fim?fmt(p.dur):tk(p.dur,1,' data-open')}</td><td data-l="Motivo">${esc(p.motivo)}</td><td><button class="x" title="Apagar" onclick="del('pausa',${p.id})">✕</button></td></tr>`).join('')
+        :'<tr><td class="vazio">Nenhuma pausa neste dia.</td></tr>';
+
+      aviso(0);
+      grafico(0);
+      if($('#dlg').open)modal();
+
+      fill($('#pt'),'<option value="">Escolha o operador</option>'+D.turnos.map(t=>`<option value="${t.id}">${esc(t.nome)} (${esc(t.processo)})</option>`).join(''));
+
+      fill($('#pm'),'<option value="">Escolha o motivo</option>'+[...D.motivos,'Outro'].map(m=>`<option>${esc(m)}</option>`).join(''));
+
+    }
+
+    async function novoTurno(){
+
+      await api('/api/turno','POST',{data:dia(),nome:$('#nome').value,processo:$('#proc').value,hora:$('#hent').value});
+
+      ['#nome','#proc','#hent'].forEach(s=>$(s).value='');
+
+      load();
+    }
+
+    const setT=async(id,campo,hora)=>{await api('/api/turno/'+id,'POST',hora===undefined?{campo}:{campo,hora});load()};
+    async function novaPausa(){
+
+      if(!$('#pt').value)return alert('Escolha o operador da pausa.');
+
+      const m=$('#pm').value==='Outro'?$('#pot').value:$('#pm').value;
+
+      await api('/api/pausa','POST',{turno_id:+$('#pt').value,os:$('#pos').value,motivo:m,hora:$('#phi').value});
+      ['#pos','#pot','#phi','#pt','#pm'].forEach(s=>$(s).value='');$('#po').hidden=true;
+
+      load();
+    }
+
+    const setP=async(id,campo,hora)=>{await api('/api/pausa/'+id,'POST',hora===undefined?{campo}:{campo,hora});load()};
+    const del=async(k,id)=>{if(confirm('Apagar este registro?')){await api('/api/'+k+'/'+id,'DELETE');load()}};
+    $('#dia').onchange=()=>load();
+    $('#dlg').onclick=e=>{if(e.target===e.currentTarget)fechar()};
+    $('#dlg').onclose=()=>{ABERTO=null};
+    load();
+    setInterval(()=>{if(!document.hidden)load(true)},2000);
+    setInterval(tick,1000);
+    document.onvisibilitychange=()=>{if(!document.hidden)load(true)};
+
+  </script>
+</body>
+</html>
