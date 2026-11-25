@@ -197,29 +197,116 @@
     padding:8px
   }
 
-  #tot{font-size:14px;font-weight:500;color:var(--mut);margin-left:10px}
+  #tot{
+    font-size:14px;
+    font-weight:500;
+    color:var(--mut);
+    margin-left:10px
+  }
 
-  .seg{display:flex;margin-bottom:10px}
-  .seg button{border-radius:0}
-  .seg button[aria-pressed=true]{background:var(--azul);border-color:var(--azul);color:#fff;font-weight:600}
-  #gr .resumo{color:var(--mut);margin-bottom:6px}
-  #gr .lin{display:grid;grid-template-columns:minmax(120px,240px) 1fr auto;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--linha)}
-  #gr .lb{overflow-wrap:anywhere}
-  .barra{background:var(--chapa);height:22px}
-  .barra i{display:block;height:100%;background:var(--aco)}
-  .vl{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
-  .vl small{font-weight:400;color:var(--mut)}
+  .seg{
+    display:flex;
+    margin-bottom:10px
+  }
 
-  .lk{border:0;background:none;padding:0;min-height:0;color:var(--aco);font-weight:600;text-decoration:underline;text-align:left}
-  .estouro .lk{color:#fff}
-  dialog{width:min(720px,94vw);max-height:85vh;padding:0;border:0;border-top:6px solid var(--azul);background:var(--papel);color:var(--aco)}
-  dialog::backdrop{background:rgba(0,0,0,.5)}
-  .dc{padding:16px 20px}
-  .dc .sub{margin:0 0 10px;color:var(--mut)}
-  .dc .resumo{margin:8px 0 0;color:var(--mut)}
-  .dc .fecha{margin-top:14px}
+  .seg button{
+    border-radius:0
+  }
 
-  #usr{align-self:center}
+  .seg button[aria-pressed=true]{
+    background:var(--azul);
+    border-color:var(--azul);
+    color:#fff;font-weight:600
+  }
+
+  #gr .resumo{
+    color:var(--mut);
+    margin-bottom:6px
+  }
+
+  #gr .lin{
+    display:grid;
+    grid-template-columns:minmax(120px,240px) 1fr auto;
+    gap:10px;
+    align-items:center;
+    padding:6px 0;
+    border-bottom:1px solid var(--linha)
+  }
+
+  #gr .lb{
+    overflow-wrap:anywhere
+  }
+
+  .barra{
+    background:var(--chapa);
+    height:22px
+  }
+
+  .barra i{
+    display:block;
+    height:100%;
+    background:var(--aco)
+  }
+
+  .vl{
+    font-variant-numeric:tabular-nums;
+    font-weight:600;
+    white-space:nowrap
+  }
+
+  .vl small{
+    font-weight:400;
+    color:var(--mut)
+  }
+
+  .lk{
+    border:0;
+    background:none;
+    padding:0;
+    min-height:0;
+    color:var(--aco);
+    font-weight:600;
+    text-decoration:underline;
+    text-align:left
+  }
+
+  .estouro .lk{
+    color:#fff
+  }
+
+  dialog{
+    width:min(720px,94vw);
+    max-height:85vh;
+    padding:0;
+    border:0;
+    border-top:6px solid var(--azul);
+    background:var(--papel);
+    color:var(--aco)
+  }
+
+  dialog::backdrop{
+    background:rgba(0,0,0,.5)
+  }
+
+  .dc{
+    padding:16px 20px
+  }
+
+  .dc .sub{
+    margin:0 0 10px;color:var(--mut)
+  }
+
+  .dc .resumo{
+    margin:8px 0 0;color:var(--mut)
+  }
+
+  .dc .fecha{
+    margin-top:14px
+  }
+
+  #usr{
+    align-self:center
+  }
 
   @media(max-width:700px){
 
@@ -298,11 +385,13 @@
 </head>
 
 <body>
+
   <header>
     <img src="/logo" alt="Logo Thermic" height="48">
     <h1>Thermic<small>Cronoanálise</small></h1>
     <div class="bar"> <span id="rel"></span> <input type="date" id="dia" aria-label="Dia"> <a class="btn" id="exp">Exportar Excel</a> <span id="usr"></span> <button onclick="sair()">Sair</button> <a class="btn" href="/admin">Usuários</a> </div>
   </header>
+
   <main>
     <div id="aviso" hidden></div>
     <section>
@@ -315,6 +404,7 @@
       </div>
       <div class="scroll"><table id="tt"></table></div>
     </section>
+
     <section>
       <h2>Pausas</h2>
       <div class="form">
@@ -327,6 +417,7 @@
       </div>
       <div class="scroll"><table id="tp"></table></div>
     </section>
+
     <section>
       <h2>Resumo das pausas</h2>
       <div class="seg">
@@ -335,7 +426,9 @@
       </div>
       <div id="gr"></div>
     </section>
+
   </main>
+
   <dialog id="dlg"><div class="dc"><div id="dlgc"></div><button class="pri fecha" onclick="fechar()">Fechar</button></div></dialog>
   <script>
 
