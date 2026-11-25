@@ -287,7 +287,7 @@ def agendador():
 
 def servir():
     try:
-        from waitress import serve  # servidor próprio para ficar ligado por dias
+        from waitress import serve
     except ImportError:
         app.run(host="0.0.0.0", port=5000)
     else:
@@ -296,11 +296,11 @@ def servir():
 
 if __name__ == "__main__":
     sem_quickedit()
-    logging.getLogger("werkzeug").setLevel(logging.ERROR)  # não escreve uma linha por requisição na janela
+    logging.getLogger("werkzeug").setLevel(logging.ERROR)  
     cabecalho()
     threading.Thread(target=agendador, daemon=True).start()
     try:
         servir()
-    except Exception as e:  # mostra o erro em vez de fechar a janela de uma vez
+    except Exception as e:  
         print("\nERRO:", e)
         input("Pressione Enter para fechar...")
