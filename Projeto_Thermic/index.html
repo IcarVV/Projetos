@@ -386,15 +386,34 @@
       if(TICK&&D.pausas.some(p=>!p.fim))grafico(dt);
     }
 
-    function abrir(id){ABERTO=id;modal();$('#dlg').showModal()}
+    function abrir(id){ABERTO={t:'p',k:id};modal();if(!$('#dlg').open)$('#dlg').showModal()}
+    function abrirG(k){
+      if(AGR==='motivo'){ABERTO={t:'m',k};modal();if(!$('#dlg').open)$('#dlg').showModal()}
+      else{const t=D.turnos.find(x=>x.nome===k);if(t)abrir(t.id)}
+    }
     function fechar(){$('#dlg').close()}
+    const dur=p=>p.fim?fmt(p.dur):tk(p.dur,1,' data-open');
     function modal(){
-      const t=D.turnos.find(x=>x.id===ABERTO);
-      if(!t){fechar();return}
-      const ps=D.pausas.filter(p=>p.turno_id===t.id);
-      $('#dlgc').innerHTML=`<h2>Pausas de ${esc(t.nome)}</h2><p class="sub">${esc(t.processo)}, ${D.data.split('-').reverse().join('/')}</p>`
+      const o=ABERTO,dt=D.data.split('-').reverse().join('/');
+      let tit,sub,ps,cab,lin;
+      if(o.t==='p'){
+        const t=D.turnos.find(x=>x.id===o.k);
+        if(!t){fechar();return}
+        ps=D.pausas.filter(p=>p.turno_id===t.id);
+        tit='Pausas de '+t.nome;sub=t.processo+', '+dt;
+        cab='<th>Início</th><th>Fim</th><th>Duração</th><th>OP / peça</th><th>Motivo</th>';
+        lin=p=>`<td data-l="Início">${p.inicio}</td><td data-l="Fim">${p.fim||'em andamento'}</td><td class="dur" data-l="Duração">${dur(p)}</td><td data-l="OP / peça">${esc(p.os)}</td><td data-l="Motivo">${esc(p.motivo)}</td>`;
+      }else{
+        ps=D.pausas.filter(p=>p.motivo===o.k);
+        if(!ps.length){fechar();return}
+        tit='Motivo: '+o.k;sub='Quem fez essa pausa, '+dt;
+        cab='<th>Operador</th><th>Processo</th><th>Início</th><th>Fim</th><th>Duração</th><th>OP / peça</th>';
+        lin=p=>`<td data-l="Operador"><button class="lk" title="Ver as pausas" onclick="abrir(${p.turno_id})">${esc(p.nome)}</button></td><td data-l="Processo">${esc(p.processo)}</td><td data-l="Início">${p.inicio}</td><td data-l="Fim">${p.fim||'em andamento'}</td><td class="dur" data-l="Duração">${dur(p)}</td><td data-l="OP / peça">${esc(p.os)}</td>`;
+      }
+      const ab=ps.filter(p=>!p.fim).length,tot=ps.reduce((a,p)=>a+p.dur,0);
+      $('#dlgc').innerHTML=`<h2>${esc(tit)}</h2><p class="sub">${esc(sub)}</p>`
         +(ps.length
-          ?`<div class="scroll"><table><tr class="cab"><th>Início</th><th>Fim</th><th>Duração</th><th>OP / peça</th><th>Motivo</th></tr>${ps.map(p=>`<tr class="${p.fim?'':'aberta'}"><td data-l="Início">${p.inicio}</td><td data-l="Fim">${p.fim||'em andamento'}</td><td class="dur" data-l="Duração">${p.fim?fmt(p.dur):tk(p.dur,1,' data-open')}</td><td data-l="OP / peça">${esc(p.os)}</td><td data-l="Motivo">${esc(p.motivo)}</td></tr>`).join('')}</table></div><p class="resumo">${ps.length} pausa${ps.length>1?'s':''}, ${tk(t.pau,rt(t).pau)} no total</p>`
+          ?`<div class="scroll"><table><tr class="cab">${cab}</tr>${ps.map(p=>`<tr class="${p.fim?'':'aberta'}">${lin(p)}</tr>`).join('')}</table></div><p class="resumo">${ps.length} pausa${ps.length>1?'s':''}, ${tk(tot,ab)} no total</p>`
           :'<p class="vazio">Nenhuma pausa registrada neste dia.</p>');
     }
 
@@ -404,10 +423,17 @@
         const k=AGR==='motivo'?p.motivo:p.nome,d=p.dur+(!p.fim&&TICK?dt:0);
         (g[k]=g[k]||{s:0,n:0}).s+=d;g[k].n++;ts+=d;tn++;
       });
-      const li=Object.entries(g).sort((a,b)=>b[1].s-a[1].s),mx=li.length?li[0][1].s||1:1;
-      $('#gr').innerHTML=li.length
-        ?`<div class="resumo">${tn} pausa${tn>1?'s':''}, ${fmt(ts)} no total</div>`+li.map(([k,v])=>`<div class="lin"><span class="lb">${esc(k)}</span><span class="barra"><i style="width:${Math.max(2,v.s/mx*100)}%"></i></span><span class="vl">${fmt(v.s)} <small>(${v.n}x)</small></span></div>`).join('')
-        :'<div class="vazio">Nenhuma pausa neste dia.</div>';
+      const li=Object.entries(g).sort((a,b)=>b[1].s-a[1].s),mx=li.length?li[0][1].s||1:1,el=$('#gr');
+      const res=`${tn} pausa${tn>1?'s':''}, ${fmt(ts)} no total`,sg=AGR+'|'+li.map(x=>x[0]).join('|');
+      const vl=v=>`${fmt(v.s)} <small>(${v.n}x)</small>`,w=v=>Math.max(2,v.s/mx*100)+'%';
+      if(!li.length){el.dataset.sg='';el.innerHTML='<div class="vazio">Nenhuma pausa neste dia.</div>';return}
+      if(el.dataset.sg===sg){ // mesma lista: só atualiza números e barras, sem trocar os botões (senão um clique pode se perder)
+        el.querySelector('.resumo').textContent=res;
+        el.querySelectorAll('.lin').forEach((r,i)=>{r.querySelector('i').style.width=w(li[i][1]);r.querySelector('.vl').innerHTML=vl(li[i][1])});
+        return;
+      }
+      el.dataset.sg=sg;
+      el.innerHTML=`<div class="resumo">${res}</div>`+li.map(([k,v])=>`<div class="lin"><span class="lb"><button class="lk" data-k="${esc(k)}" title="Ver detalhes">${esc(k)}</button></span><span class="barra"><i style="width:${w(v)}"></i></span><span class="vl">${vl(v)}</span></div>`).join('');
     }
     function gmod(m){
       AGR=m;
@@ -477,6 +503,7 @@
     $('#dia').onchange=()=>load();
     $('#dlg').onclick=e=>{if(e.target===e.currentTarget)fechar()};
     $('#dlg').onclose=()=>{ABERTO=null};
+    $('#gr').onclick=e=>{const b=e.target.closest('.lk');if(b)abrirG(b.dataset.k)};
     load();
     setInterval(()=>{if(!document.hidden)load(true)},2000);
     setInterval(tick,1000);

@@ -1,15 +1,21 @@
 import io
+import logging
 import os
 import socket
 import sqlite3
 import sys
+import threading
+import time
+from contextlib import contextmanager
 from datetime import date, datetime
 
 from flask import Flask, jsonify, request, send_file, send_from_directory
 from openpyxl import Workbook
 from openpyxl.styles import Font
 
-ALERTA_MIN = 15  # pausa aberta há mais minutos que isso fica em vermelho
+HORA_LIMPEZA = "17:00"
+DIAS_BACKUP = 60  
+ALERTA_MIN = 15 
 MOTIVOS = ["Pausa pessoal", "Café/Lanche", "Solicitação de material", "Retirada de material",
            "Desvio de foco", "Manutenção de máquina", "Aguardando gestão", "Não identificado", 
            "Início/Término de serviço", "Aguardando liberação/Inspeção", "Troca de EPI",
@@ -19,14 +25,21 @@ MOTIVOS = ["Pausa pessoal", "Café/Lanche", "Solicitação de material", "Retira
 PASTA = (os.path.dirname(sys.executable) if getattr(sys, "frozen", False)
          else os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(PASTA, "cronoanalise.db")
+BACKUP = os.path.join(PASTA, "backup")
 CAMPOS = ("entrada", "saida_almoco", "volta_almoco", "saida_final")
 app = Flask(__name__)
 
 
+@contextmanager
 def db():
-    c = sqlite3.connect(DB)
+    """Abre o banco, confirma (commit) no fim e SEMPRE fecha a conexão."""
+    c = sqlite3.connect(DB, timeout=10)
     c.row_factory = sqlite3.Row
-    return c
+    try:
+        with c:
+            yield c
+    finally:
+        c.close()
 
 
 with db() as c:
@@ -210,14 +223,84 @@ def ip_local():
         s.close()
 
 
-if __name__ == "__main__":
+def sem_quickedit():
+    """No Windows, clicar na janela preta entra no modo de seleção e PAUSA o programa. Isto desliga esse modo."""
+    if os.name != "nt":
+        return
+    try:
+        import ctypes
+        k = ctypes.windll.kernel32
+        h = k.GetStdHandle(-10)  # entrada do console
+        m = ctypes.c_uint32()
+        k.GetConsoleMode(h, ctypes.byref(m))
+        k.SetConsoleMode(h, (m.value & ~0x0040) | 0x0080)
+    except Exception:
+        pass
+
+
+def cabecalho():
     print(f"\nNeste PC: http://127.0.0.1:5000\nCelulares e outros PCs (mesma rede): http://{ip_local()}:5000\n")
     print(f"Pasta dos arquivos: {PASTA}")
     for f in ("index.html", "LogoThermic.png", "LogoThermic.ico"):
         if not os.path.exists(os.path.join(PASTA, f)):
             print(f"ATENCAO: {f} nao foi encontrado nessa pasta")
+    print(f"Limpeza diaria com backup as {HORA_LIMPEZA} (pasta backup)\n")
+
+
+def limpeza():
+    """Backup do banco, compactação e limpeza da janela. Não apaga nenhum registro."""
+    os.makedirs(BACKUP, exist_ok=True)
+    destino = os.path.join(BACKUP, f"cronoanalise_{date.today().isoformat()}.db")
+    with db() as c:
+        copia = sqlite3.connect(destino)
+        try:
+            c.backup(copia)
+        finally:
+            copia.close()
+    try:  # compacta o arquivo do banco
+        c = sqlite3.connect(DB, isolation_level=None)
+        c.execute("VACUUM")
+        c.close()
+    except sqlite3.Error:
+        pass
+    limite = time.time() - DIAS_BACKUP * 86400
+    for f in os.listdir(BACKUP):
+        p = os.path.join(BACKUP, f)
+        if f.endswith(".db") and os.path.getmtime(p) < limite:
+            os.remove(p)
+    os.system("cls" if os.name == "nt" else "clear")
+    cabecalho()
+    print(f"Limpeza das {datetime.now():%H:%M} concluida. Backup salvo em {destino}")
+
+
+def agendador():
+    feito = None
+    while True:
+        try:
+            if datetime.now().strftime("%H:%M") >= HORA_LIMPEZA and feito != date.today():
+                feito = date.today()
+                limpeza()
+        except Exception as e:
+            print("Falha na limpeza:", e)
+        time.sleep(30)
+
+
+def servir():
     try:
+        from waitress import serve  # servidor próprio para ficar ligado por dias
+    except ImportError:
         app.run(host="0.0.0.0", port=5000)
+    else:
+        serve(app, host="0.0.0.0", port=5000, threads=8)
+
+
+if __name__ == "__main__":
+    sem_quickedit()
+    logging.getLogger("werkzeug").setLevel(logging.ERROR)  # não escreve uma linha por requisição na janela
+    cabecalho()
+    threading.Thread(target=agendador, daemon=True).start()
+    try:
+        servir()
     except Exception as e:  # mostra o erro em vez de fechar a janela de uma vez
         print("\nERRO:", e)
         input("Pressione Enter para fechar...")
