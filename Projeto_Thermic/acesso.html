@@ -6,37 +6,162 @@
 <link rel="icon" href="/LogoThermic.ico" type="image/x-icon">
 <title>Thermic - Acesso</title>
 <style>
-:root{--chapa:#e6e9ec;--papel:#f7f8f9;--aco:#800812;--mut:#5b6672;--linha:#c3cad1;--azul:#25040a;--brasa:#d23b1c}
-*{box-sizing:border-box}
-body{margin:0;background:var(--chapa);color:var(--aco);font:16px/1.4 Bahnschrift,"DIN Alternate","Segoe UI",system-ui,sans-serif}
+
+:root{--chapa:#e6e9ec;
+  --papel:#f7f8f9;
+  --aco:#800812;
+  --mut:#5b6672;
+  --linha:#c3cad1;
+  --azul:#25040a;
+  --brasa:#d23b1c
+}
+
+*{
+  box-sizing:border-box
+}
+
+body{
+  margin:0;
+  background:var(--chapa);
+  color:var(--aco);
+  font:16px/1.4 Bahnschrift,"DIN Alternate","Segoe UI",system-ui,sans-serif
+}
+
 [hidden]{display:none!important}
-header{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding:12px 20px;background:var(--aco);color:#fff}
-header img{background:#fff;padding:4px 8px;border-radius:2px}
-h1{margin:0;font-size:22px;font-weight:600}
-h1 small{font-weight:400;opacity:.7;margin-left:8px;font-size:18px}
-main{max-width:720px;margin:0 auto;padding:16px;display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
-section{background:var(--papel);border-top:6px solid var(--azul);padding:14px 16px 16px}
-h2{margin:0 0 12px;font-size:18px}
-form,.linha{display:flex;flex-wrap:wrap;gap:8px;align-items:end}
-label{display:grid;gap:2px;font-size:13px;color:var(--mut);flex:1 1 160px}
-input,button,.btn{font:inherit;min-height:42px;padding:6px 10px;border:1px solid var(--linha);border-radius:3px;background:#fff;color:var(--aco)}
-button,.btn{cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
-.pri,.btn{background:var(--azul);border-color:var(--azul);color:#fff;font-weight:600}
-:focus-visible{outline:3px solid var(--brasa);outline-offset:1px}
-.msg{margin:10px 0 0;color:var(--brasa);font-weight:600}
-.scroll{overflow-x:auto}
-table{width:100%;border-collapse:collapse;white-space:nowrap}
-th,td{padding:6px 8px;border-bottom:1px solid var(--linha);text-align:left}
-th{font-size:13px;font-weight:500;color:var(--mut)}
-.off td{color:var(--mut)}
+
+header{display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  justify-content:space-between
+  ;align-items:center
+  ;padding:12px 20px
+  ;background:var(--aco)
+  ;color:#fff
+}
+
+header img{background:#fff;
+  padding:4px 8px;
+  border-radius:2px
+}
+
+h1{margin:0;
+  font-size:22px;
+  font-weight:600
+}
+
+h1 small{
+  font-weight:400;
+  opacity:.7;
+  margin-left:8px;
+  font-size:18px
+}
+
+main{
+  max-width:720px;
+  margin:0 auto;
+  padding:16px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:20px
+}
+
+section{
+  background:var(--papel);
+  border-top:6px solid var(--azul);
+  padding:14px 16px 16px
+}
+
+h2{
+  margin:0 0 12px;
+  font-size:18px
+}
+
+form,.linha{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:end
+}
+
+label{
+  display:grid;
+  gap:2px;
+  font-size:13px;
+  color:var(--mut);
+  flex:1 1 160px
+}
+
+input,button,.btn{
+  font:inherit;
+  min-height:42px;
+  padding:6px 10px;
+  border:1px solid var(--linha);
+  border-radius:3px;
+  background:#fff;color:var(--aco)
+}
+
+button,.btn{
+  cursor:pointer;
+  text-decoration:none;
+  display:inline-flex;align-items:center
+}
+
+
+.pri,.btn{
+  background:var(--azul);
+  border-color:var(--azul);
+  color:#fff;font-weight:600
+}
+
+:focus-visible{
+  outline:3px solid var(--brasa);
+  outline-offset:1px
+}
+
+.msg{
+  margin:10px 0 0;
+  color:var(--brasa);
+  font-weight:600
+}
+
+.scroll{
+  overflow-x:auto
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  white-space:nowrap
+}
+
+th,td{
+  padding:6px 8px;
+  border-bottom:1px solid var(--linha);
+  text-align:left
+}
+
+th{
+  font-size:13px;
+  font-weight:500;
+  color:var(--mut)
+}
+
+.off td{
+  color:var(--mut)
+}
+
 </style>
+
 </head>
+
 <body>
+
 <header>
   <img src="/logo" alt="Logo Thermic" height="48">
   <h1>Thermic<small>Cronoanálise</small></h1>
   <a class="btn" href="/">Voltar ao sistema</a>
 </header>
+
 <main>
   <section id="v-login" hidden>
     <h2>Entrar</h2>
@@ -70,14 +195,19 @@ th{font-size:13px;font-weight:500;color:var(--mut)}
       <label>Senha<input id="us" type="password"></label>
       <button class="pri">Cadastrar</button>
     </form>
+
     <p class="msg" id="m3"></p>
     <div class="linha" style="margin-top:14px">
       <button onclick="trocarAdm()">Trocar senha de administrador</button>
       <button onclick="admSair()">Sair do modo administrador</button>
     </div>
+
   </section>
+
 </main>
+
 <script>
+
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function api(u,m='GET',b){
@@ -153,6 +283,9 @@ async function trocarAdm(){
 async function admSair(){await api('/api/admin/sair','POST');location.reload()}
 
 iniciar();
+
 </script>
+
 </body>
+
 </html>
