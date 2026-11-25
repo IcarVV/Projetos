@@ -1,21 +1,23 @@
 import io
 import logging
 import os
+import secrets
 import socket
 import sqlite3
 import sys
 import threading
 import time
 from contextlib import contextmanager
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
-from flask import Flask, jsonify, request, send_file, send_from_directory
+from flask import Flask, jsonify, redirect, request, send_file, send_from_directory, session
+from werkzeug.security import check_password_hash, generate_password_hash
 from openpyxl import Workbook
 from openpyxl.styles import Font
 
-HORA_LIMPEZA = "17:00"
-DIAS_BACKUP = 60  
-ALERTA_MIN = 15 
+HORA_LIMPEZA = "23:55"  # todo dia, nesse horário: backup do banco e limpeza (nenhum registro é apagado)
+DIAS_BACKUP = 60  # backups mais antigos que isso são apagados
+ALERTA_MIN = 15  # pausa aberta há mais minutos que isso fica em vermelho
 MOTIVOS = ["Pausa pessoal", "Café/Lanche", "Solicitação de material", "Retirada de material",
            "Desvio de foco", "Manutenção de máquina", "Aguardando gestão", "Não identificado", 
            "Início/Término de serviço", "Aguardando liberação/Inspeção", "Troca de EPI",
@@ -47,7 +49,10 @@ with db() as c:
     CREATE TABLE IF NOT EXISTS turnos(id INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT, nome TEXT,
         processo TEXT, entrada TEXT, saida_almoco TEXT, volta_almoco TEXT, saida_final TEXT);
     CREATE TABLE IF NOT EXISTS pausas(id INTEGER PRIMARY KEY AUTOINCREMENT, turno_id INTEGER,
-        os TEXT, inicio TEXT, fim TEXT, motivo TEXT);""")
+        os TEXT, inicio TEXT, fim TEXT, motivo TEXT);
+    CREATE TABLE IF NOT EXISTS usuarios(id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT, login TEXT UNIQUE,
+        senha TEXT, ativo INTEGER DEFAULT 1);
+    CREATE TABLE IF NOT EXISTS config(chave TEXT PRIMARY KEY, valor TEXT);""")
 
 
 def agora():
@@ -89,6 +94,171 @@ def dados(data):
     return ts, ps
 
 
+# ---------- usuários (login e senha) e senha de administrador ----------
+def cfg_get(k):
+    with db() as c:
+        r = c.execute("SELECT valor FROM config WHERE chave=?", (k,)).fetchone()
+    return r["valor"] if r else None
+
+
+def cfg_set(k, v):
+    with db() as c:
+        c.execute("INSERT OR REPLACE INTO config(chave,valor) VALUES(?,?)", (k, v))
+
+
+if not cfg_get("secret"):
+    cfg_set("secret", secrets.token_hex(32))  # guardada no banco: os logins sobrevivem a reinícios
+app.secret_key = cfg_get("secret")
+app.permanent_session_lifetime = timedelta(days=30)
+app.config.update(SESSION_COOKIE_NAME="thermic_sessao", SESSION_COOKIE_SAMESITE="Lax")
+PUBLICAS = ("/login", "/admin", "/logo", "/LogoThermic.ico", "/favicon.ico", "/api/login", "/api/logout", "/api/eu")
+FALHAS = {}  # ip -> (erros seguidos, bloqueado até)
+
+
+def usuario_atual():
+    uid = session.get("uid")
+    if not uid:
+        return None
+    with db() as c:
+        return c.execute("SELECT id, nome FROM usuarios WHERE id=? AND ativo=1", (uid,)).fetchone()
+
+
+def admin_ativo():
+    return session.get("admin_ate", 0) > time.time()  # o modo administrador dura 30 min
+
+
+def bloqueado():
+    return FALHAS.get(request.remote_addr, (0, 0))[1] > time.time()
+
+
+def falha():
+    ip = request.remote_addr
+    n = FALHAS.get(ip, (0, 0))[0] + 1
+    FALHAS[ip] = (0, time.time() + 60) if n >= 5 else (n, 0)
+
+
+@app.before_request
+def exigir_login():
+    p = request.path
+    if p in PUBLICAS or p.startswith("/api/admin/") or usuario_atual():
+        return None
+    if p.startswith("/api/"):
+        return "Faça login para continuar.", 401
+    return redirect("/login")
+
+
+@app.get("/login")
+@app.get("/admin")
+def pagina_acesso():
+    return send_from_directory(PASTA, "acesso.html")
+
+
+@app.get("/api/eu")
+def api_eu():
+    u = usuario_atual()
+    return jsonify(logado=bool(u), admin=admin_ativo(), admin_definida=bool(cfg_get("admin")))
+
+
+@app.post("/api/login")
+def api_login():
+    if bloqueado():
+        return "Muitas tentativas. Aguarde 1 minuto.", 429
+    j = request.get_json()
+    with db() as c:
+        u = c.execute("SELECT * FROM usuarios WHERE login=? AND ativo=1", ((j.get("login") or "").strip().lower(),)).fetchone()
+    if not u or not check_password_hash(u["senha"], j.get("senha") or ""):
+        falha()
+        return "Login ou senha incorretos.", 401
+    FALHAS.pop(request.remote_addr, None)
+    session.clear()
+    session.permanent = True
+    session["uid"] = u["id"]
+    return jsonify(ok=True)
+
+
+@app.post("/api/logout")
+def api_logout():
+    session.pop("uid", None)
+    return jsonify(ok=True)
+
+
+@app.post("/api/admin/entrar")
+def admin_entrar():
+    if bloqueado():
+        return "Muitas tentativas. Aguarde 1 minuto.", 429
+    h = cfg_get("admin")
+    if not h or not check_password_hash(h, request.get_json().get("senha") or ""):
+        falha()
+        return "Senha de administrador incorreta.", 401
+    FALHAS.pop(request.remote_addr, None)
+    session.permanent = True
+    session["admin_ate"] = time.time() + 1800
+    return jsonify(ok=True)
+
+
+@app.post("/api/admin/sair")
+def admin_sair():
+    session.pop("admin_ate", None)
+    return jsonify(ok=True)
+
+
+@app.post("/api/admin/definir")
+def admin_definir():
+    """Cria a senha de administrador (só no PC do servidor) ou troca, se já estiver no modo administrador."""
+    if not cfg_get("admin") and request.remote_addr not in ("127.0.0.1", "::1"):
+        return "A senha de administrador só pode ser criada no PC do servidor: abra http://127.0.0.1:5000/admin nele.", 403
+    if cfg_get("admin") and not admin_ativo():
+        return "Entre como administrador primeiro.", 401
+    nova = request.get_json().get("senha") or ""
+    if len(nova) < 4:
+        return "A senha deve ter pelo menos 4 caracteres.", 400
+    cfg_set("admin", generate_password_hash(nova))
+    session.permanent = True
+    session["admin_ate"] = time.time() + 1800
+    return jsonify(ok=True)
+
+
+@app.get("/api/admin/usuarios")
+def admin_lista():
+    if not admin_ativo():
+        return "Entre como administrador.", 401
+    with db() as c:
+        return jsonify([dict(r) for r in c.execute("SELECT id, nome, login, ativo FROM usuarios ORDER BY nome")])
+
+
+@app.post("/api/admin/usuarios")
+def admin_novo():
+    if not admin_ativo():
+        return "Entre como administrador.", 401
+    j = request.get_json()
+    nome, login, senha = (j.get("nome") or "").strip(), (j.get("login") or "").strip().lower(), j.get("senha") or ""
+    if not nome or len(login) < 3 or " " in login:
+        return "Informe o nome e um login de pelo menos 3 letras, sem espaços.", 400
+    if len(senha) < 4:
+        return "A senha deve ter pelo menos 4 caracteres.", 400
+    with db() as c:
+        if c.execute("SELECT 1 FROM usuarios WHERE login=?", (login,)).fetchone():
+            return "Esse login já existe.", 400
+        c.execute("INSERT INTO usuarios(nome,login,senha) VALUES(?,?,?)", (nome, login, generate_password_hash(senha)))
+    return jsonify(ok=True)
+
+
+@app.post("/api/admin/usuarios/<int:i>")
+def admin_edita(i):
+    if not admin_ativo():
+        return "Entre como administrador.", 401
+    j = request.get_json()
+    senha = j.get("senha") or ""
+    if senha and len(senha) < 4:
+        return "A senha deve ter pelo menos 4 caracteres.", 400
+    with db() as c:
+        if "ativo" in j:  # desativar não apaga nada: o histórico continua
+            c.execute("UPDATE usuarios SET ativo=? WHERE id=?", (1 if j["ativo"] else 0, i))
+        if senha:
+            c.execute("UPDATE usuarios SET senha=? WHERE id=?", (generate_password_hash(senha), i))
+    return jsonify(ok=True)
+
+
 @app.get("/")
 def index():
     return send_from_directory(PASTA, "index.html")
@@ -108,6 +278,7 @@ def api_dia():
     data = request.args.get("data") or date.today().isoformat()
     ts, ps = dados(data)
     return jsonify(data=data, hoje=date.today().isoformat(), agora=agora(),  
+                   usuario=(usuario_atual() or {"nome": ""})["nome"],
                    turnos=ts, pausas=ps, motivos=MOTIVOS, alerta_min=ALERTA_MIN)
 
 
@@ -241,10 +412,11 @@ def sem_quickedit():
 def cabecalho():
     print(f"\nNeste PC: http://127.0.0.1:5000\nCelulares e outros PCs (mesma rede): http://{ip_local()}:5000\n")
     print(f"Pasta dos arquivos: {PASTA}")
-    for f in ("index.html", "LogoThermic.png", "LogoThermic.ico"):
+    for f in ("index.html", "acesso.html", "LogoThermic.png", "LogoThermic.ico"):
         if not os.path.exists(os.path.join(PASTA, f)):
             print(f"ATENCAO: {f} nao foi encontrado nessa pasta")
-    print(f"Limpeza diaria com backup as {HORA_LIMPEZA} (pasta backup)\n")
+    print(f"Limpeza diaria com backup as {HORA_LIMPEZA} (pasta backup)")
+    print("Cadastro de usuarios e senha de administrador: http://127.0.0.1:5000/admin\n")
 
 
 def limpeza():
@@ -287,7 +459,7 @@ def agendador():
 
 def servir():
     try:
-        from waitress import serve
+        from waitress import serve  # servidor próprio para ficar ligado por dias
     except ImportError:
         app.run(host="0.0.0.0", port=5000)
     else:
@@ -296,11 +468,11 @@ def servir():
 
 if __name__ == "__main__":
     sem_quickedit()
-    logging.getLogger("werkzeug").setLevel(logging.ERROR)  
+    logging.getLogger("werkzeug").setLevel(logging.ERROR)  # não escreve uma linha por requisição na janela
     cabecalho()
     threading.Thread(target=agendador, daemon=True).start()
     try:
         servir()
-    except Exception as e:  
+    except Exception as e:  # mostra o erro em vez de fechar a janela de uma vez
         print("\nERRO:", e)
         input("Pressione Enter para fechar...")

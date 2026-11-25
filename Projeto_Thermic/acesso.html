@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/LogoThermic.ico" type="image/x-icon">
+<title>Thermic - Acesso</title>
+<style>
+:root{--chapa:#e6e9ec;--papel:#f7f8f9;--aco:#800812;--mut:#5b6672;--linha:#c3cad1;--azul:#25040a;--brasa:#d23b1c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--chapa);color:var(--aco);font:16px/1.4 Bahnschrift,"DIN Alternate","Segoe UI",system-ui,sans-serif}
+[hidden]{display:none!important}
+header{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding:12px 20px;background:var(--aco);color:#fff}
+header img{background:#fff;padding:4px 8px;border-radius:2px}
+h1{margin:0;font-size:22px;font-weight:600}
+h1 small{font-weight:400;opacity:.7;margin-left:8px;font-size:18px}
+main{max-width:720px;margin:0 auto;padding:16px;display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
+section{background:var(--papel);border-top:6px solid var(--azul);padding:14px 16px 16px}
+h2{margin:0 0 12px;font-size:18px}
+form,.linha{display:flex;flex-wrap:wrap;gap:8px;align-items:end}
+label{display:grid;gap:2px;font-size:13px;color:var(--mut);flex:1 1 160px}
+input,button,.btn{font:inherit;min-height:42px;padding:6px 10px;border:1px solid var(--linha);border-radius:3px;background:#fff;color:var(--aco)}
+button,.btn{cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+.pri,.btn{background:var(--azul);border-color:var(--azul);color:#fff;font-weight:600}
+:focus-visible{outline:3px solid var(--brasa);outline-offset:1px}
+.msg{margin:10px 0 0;color:var(--brasa);font-weight:600}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;white-space:nowrap}
+th,td{padding:6px 8px;border-bottom:1px solid var(--linha);text-align:left}
+th{font-size:13px;font-weight:500;color:var(--mut)}
+.off td{color:var(--mut)}
+</style>
+</head>
+<body>
+<header>
+  <img src="/logo" alt="Logo Thermic" height="48">
+  <h1>Thermic<small>Cronoanálise</small></h1>
+  <a class="btn" href="/">Voltar ao sistema</a>
+</header>
+<main>
+  <section id="v-login" hidden>
+    <h2>Entrar</h2>
+    <form onsubmit="return entrar(event)">
+      <label>Login<input id="lg" autocomplete="username" autocapitalize="none"></label>
+      <label>Senha<input id="sn" type="password" autocomplete="current-password"></label>
+      <button class="pri">Entrar</button>
+    </form>
+    <p class="msg" id="m1"></p>
+  </section>
+
+  <section id="v-adm-login" hidden>
+    <h2 id="t-adm">Administrador</h2>
+    <form onsubmit="return admEntrar(event)">
+      <label>Senha de administrador<input id="as" type="password"></label>
+      <button class="pri" id="b-adm">Entrar</button>
+    </form>
+    <p class="msg" id="m2"></p>
+  </section>
+
+  <section id="v-adm" hidden>
+    <h2>Usuários cadastrados</h2>
+    <div class="scroll"><table id="ut"></table></div>
+  </section>
+
+  <section id="v-adm2" hidden>
+    <h2>Novo usuário</h2>
+    <form onsubmit="return novo(event)">
+      <label>Nome<input id="un"></label>
+      <label>Login<input id="ul" autocapitalize="none"></label>
+      <label>Senha<input id="us" type="password"></label>
+      <button class="pri">Cadastrar</button>
+    </form>
+    <p class="msg" id="m3"></p>
+    <div class="linha" style="margin-top:14px">
+      <button onclick="trocarAdm()">Trocar senha de administrador</button>
+      <button onclick="admSair()">Sair do modo administrador</button>
+    </div>
+  </section>
+</main>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function api(u,m='GET',b){
+  const r=await fetch(u,{method:m,headers:{'Content-Type':'application/json'},body:b&&JSON.stringify(b)});
+  if(!r.ok){const e=new Error(await r.text());e.status=r.status;throw e}
+  return r.json();
+}
+let US=[];
+
+async function iniciar(){
+  const eu=await api('/api/eu');
+  if(location.pathname!=='/admin'){
+    if(eu.logado){location='/';return}
+    $('#v-login').hidden=false;
+    return;
+  }
+  if(!eu.admin_definida){$('#t-adm').textContent='Criar senha de administrador';$('#b-adm').textContent='Criar senha'}
+  if(eu.admin)mostrarAdm();else $('#v-adm-login').hidden=false;
+}
+
+async function entrar(e){
+  e.preventDefault();
+  try{await api('/api/login','POST',{login:$('#lg').value,senha:$('#sn').value});location='/'}
+  catch(x){$('#m1').textContent=x.message}
+  return false;
+}
+
+async function admEntrar(e){
+  e.preventDefault();
+  try{
+    const eu=await api('/api/eu');
+    await api(eu.admin_definida?'/api/admin/entrar':'/api/admin/definir','POST',{senha:$('#as').value});
+    $('#as').value='';$('#v-adm-login').hidden=true;
+    mostrarAdm();
+  }catch(x){$('#m2').textContent=x.message}
+  return false;
+}
+
+async function mostrarAdm(){
+  $('#v-adm').hidden=false;$('#v-adm2').hidden=false;
+  try{US=await api('/api/admin/usuarios')}catch(x){if(x.status===401){location.reload();return}throw x}
+  $('#ut').innerHTML=US.length
+    ?'<tr><th>Nome</th><th>Login</th><th>Situação</th><th></th></tr>'+US.map(u=>`<tr class="${u.ativo?'':'off'}"><td>${esc(u.nome)}</td><td>${esc(u.login)}</td><td>${u.ativo?'Ativo':'Desativado'}</td><td><button onclick="senha(${u.id})">Nova senha</button> <button onclick="ativo(${u.id},${u.ativo?0:1})">${u.ativo?'Desativar':'Ativar'}</button></td></tr>`).join('')
+    :'<tr><td>Nenhum usuário cadastrado ainda.</td></tr>';
+}
+
+async function novo(e){
+  e.preventDefault();
+  try{
+    await api('/api/admin/usuarios','POST',{nome:$('#un').value,login:$('#ul').value,senha:$('#us').value});
+    ['#un','#ul','#us'].forEach(s=>$(s).value='');$('#m3').textContent='';
+    mostrarAdm();
+  }catch(x){$('#m3').textContent=x.message}
+  return false;
+}
+
+async function senha(id){
+  const u=US.find(x=>x.id===id),s=prompt('Nova senha para '+u.nome+' (mínimo 4 caracteres):');
+  if(!s)return;
+  try{await api('/api/admin/usuarios/'+id,'POST',{senha:s});alert('Senha alterada.')}catch(x){alert(x.message)}
+}
+
+async function ativo(id,v){
+  try{await api('/api/admin/usuarios/'+id,'POST',{ativo:v});mostrarAdm()}catch(x){alert(x.message)}
+}
+
+async function trocarAdm(){
+  const s=prompt('Nova senha de administrador (mínimo 4 caracteres):');
+  if(!s)return;
+  try{await api('/api/admin/definir','POST',{senha:s});alert('Senha de administrador alterada.')}catch(x){alert(x.message)}
+}
+
+async function admSair(){await api('/api/admin/sair','POST');location.reload()}
+
+iniciar();
+</script>
+</body>
+</html>

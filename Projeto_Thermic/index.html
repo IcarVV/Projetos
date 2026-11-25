@@ -219,6 +219,8 @@
   .dc .resumo{margin:8px 0 0;color:var(--mut)}
   .dc .fecha{margin-top:14px}
 
+  #usr{align-self:center}
+
   @media(max-width:700px){
 
     .scroll{
@@ -299,7 +301,7 @@
   <header>
     <img src="/logo" alt="Logo Thermic" height="48">
     <h1>Thermic<small>Cronoanálise</small></h1>
-    <div class="bar"> <span id="rel"></span> <input type="date" id="dia" aria-label="Dia"> <a class="btn" id="exp">Exportar Excel</a> </div>
+    <div class="bar"> <span id="rel"></span> <input type="date" id="dia" aria-label="Dia"> <a class="btn" id="exp">Exportar Excel</a> <span id="usr"></span> <button onclick="sair()">Sair</button> <a class="btn" href="/admin">Usuários</a> </div>
   </header>
   <main>
     <div id="aviso" hidden></div>
@@ -345,6 +347,7 @@
     let D,CK,T0=0,TICK=false,SIG='',AGR='motivo',ABERTO=null;
     async function api(u,m='GET',b){
       const r=await fetch(u,{method:m,headers:{'Content-Type':'application/json'},body:b&&JSON.stringify(b)});
+      if(r.status===401){location='/login';throw 0}
       if(!r.ok){alert(await r.text());throw 0}
       return r.json();
     }
@@ -354,6 +357,7 @@
       const nd=await api('/api/dia?data='+dia());
       CK={t:Date.now(),s:nd.agora.split(':').reduce((a,x)=>a*60+ +x,0)}; // relógio do PC (servidor)
       if(!dia())$('#dia').value=nd.data;
+      $('#usr').textContent=nd.usuario;
       const s=sig(nd);
     
       // só redesenha se algo mudou (em qualquer aparelho); os cronômetros andam sozinhos entre uma mudança e outra
@@ -499,6 +503,7 @@
     }
 
     const setP=async(id,campo,hora)=>{await api('/api/pausa/'+id,'POST',hora===undefined?{campo}:{campo,hora});load()};
+    const sair=async()=>{await api('/api/logout','POST');location='/login'};
     const del=async(k,id)=>{if(confirm('Apagar este registro?')){await api('/api/'+k+'/'+id,'DELETE');load()}};
     $('#dia').onchange=()=>load();
     $('#dlg').onclick=e=>{if(e.target===e.currentTarget)fechar()};
