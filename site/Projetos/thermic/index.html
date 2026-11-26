@@ -314,9 +314,15 @@
       <a href="/Projetos/">_voltar</a>
     </div>
 
-    <h1>Thermic<small>Cronoanálise</small></h1>
-    <div class="bar"> <span id="rel"></span> <input type="date" id="dia" aria-label="Dia"> <a class="btn" id="exp">Exportar Excel</a> </div>
+    <h1>Termica<small>Cronoanálise</small></h1>
+    <div class="bar"> <span id="rel"></span> <input type="date" id="dia" aria-label="Dia"> 
+    
+      <a class="btn" id="exp">Exportar Excel</a> 
+    
+    </div>
+
   </header>
+
   <main>
     <div id="aviso" hidden></div>
     <section>
@@ -351,153 +357,7 @@
     </section>
   </main>
   <dialog id="dlg"><div class="dc"><div id="dlgc"></div><button class="pri fecha" onclick="fechar()">Fechar</button></div></dialog>
-  <!-- <script>
-
-    const $=s=>document.querySelector(s), C=['entrada','saida_almoco','volta_almoco','saida_final'];
-    const L={entrada:'Entrada',saida_almoco:'Saída almoço',volta_almoco:'Volta almoço',saida_final:'Saída final'};
-    const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-    const fmt=s=>{const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return h+':'+String(m).padStart(2,'0')+':'+String(x).padStart(2,'0')};
-    const dia=()=>$('#dia').value;
-    let D,CK,T0=0,TICK=false,SIG='',AGR='motivo',ABERTO=null;
-    async function api(u,m='GET',b){
-      const r=await fetch(u,{method:m,headers:{'Content-Type':'application/json'},body:b&&JSON.stringify(b)});
-      if(!r.ok){alert(await r.text());throw 0}
-      return r.json();
-    }
-
-    const sig=d=>JSON.stringify([dia(),d.turnos.map(t=>[t.id,t.nome,t.processo,...C.map(c=>t[c])]),d.pausas.map(p=>[p.id,p.turno_id,p.os,p.inicio,p.fim,p.motivo])]);
-    async function load(poll){
-      const nd=await api('/api/dia?data='+dia());
-      CK={t:Date.now(),s:nd.agora.split(':').reduce((a,x)=>a*60+ +x,0)}; // relógio do PC (servidor)
-      if(!dia())$('#dia').value=nd.data;
-      const s=sig(nd);
-    
-      // só redesenha se algo mudou (em qualquer aparelho); os cronômetros andam sozinhos entre uma mudança e outra
-      if(s===SIG||(poll&&document.activeElement.matches('table input')))return;
-      SIG=s;D=nd;render();
-    }
-
-    const tk=(v,r,x='')=>`<span class="tick" data-s="${v}" data-r="${TICK?r:0}"${x}>${fmt(v)}</span>`;
-    const rt=t=>{const l=t.saida_final?0:1,a=t.saida_almoco&&!t.volta_almoco?l:0,o=D.pausas.filter(p=>p.turno_id===t.id&&!p.fim).length;return{pau:o,trab:l-a-o}};
-    function aviso(dt){
-      const lim=D.alerta_min*60,n=D.pausas.filter(p=>!p.fim&&p.dur+(TICK?dt:0)>=lim).map(p=>p.nome),av=$('#aviso');
-      av.hidden=!n.length;av.textContent='Pausa acima de '+D.alerta_min+' min: '+n.join(', ');
-    }
-
-    function relogio(){
-      const s=(CK.s+Math.floor((Date.now()-CK.t)/1000))%86400,p=x=>String(Math.floor(x)).padStart(2,'0');
-      $('#rel').textContent='Hora do PC '+p(s/3600)+':'+p(s%3600/60)+':'+p(s%60);
-    }
-
-    function tick(){
-      if(CK)relogio();
-      if(!D)return;
-      const dt=Math.floor((Date.now()-T0)/1000),lim=D.alerta_min*60;
-      document.querySelectorAll('.tick').forEach(e=>{
-        const v=Math.max(0,+e.dataset.s+e.dataset.r*dt);
-        e.textContent=fmt(v);
-        if(e.hasAttribute('data-open'))e.closest('tr').className=v>=lim?'estouro':'aberta';
-      });
-      aviso(dt);
-      if(TICK&&D.pausas.some(p=>!p.fim))grafico(dt);
-    }
-
-    function abrir(id){ABERTO=id;modal();$('#dlg').showModal()}
-    function fechar(){$('#dlg').close()}
-    function modal(){
-      const t=D.turnos.find(x=>x.id===ABERTO);
-      if(!t){fechar();return}
-      const ps=D.pausas.filter(p=>p.turno_id===t.id);
-      $('#dlgc').innerHTML=`<h2>Pausas de ${esc(t.nome)}</h2><p class="sub">${esc(t.processo)}, ${D.data.split('-').reverse().join('/')}</p>`
-        +(ps.length
-          ?`<div class="scroll"><table><tr class="cab"><th>Início</th><th>Fim</th><th>Duração</th><th>OP / peça</th><th>Motivo</th></tr>${ps.map(p=>`<tr class="${p.fim?'':'aberta'}"><td data-l="Início">${p.inicio}</td><td data-l="Fim">${p.fim||'em andamento'}</td><td class="dur" data-l="Duração">${p.fim?fmt(p.dur):tk(p.dur,1,' data-open')}</td><td data-l="OP / peça">${esc(p.os)}</td><td data-l="Motivo">${esc(p.motivo)}</td></tr>`).join('')}</table></div><p class="resumo">${ps.length} pausa${ps.length>1?'s':''}, ${tk(t.pau,rt(t).pau)} no total</p>`
-          :'<p class="vazio">Nenhuma pausa registrada neste dia.</p>');
-    }
-
-    function grafico(dt){
-      const g={};let ts=0,tn=0;
-      D.pausas.forEach(p=>{
-        const k=AGR==='motivo'?p.motivo:p.nome,d=p.dur+(!p.fim&&TICK?dt:0);
-        (g[k]=g[k]||{s:0,n:0}).s+=d;g[k].n++;ts+=d;tn++;
-      });
-      const li=Object.entries(g).sort((a,b)=>b[1].s-a[1].s),mx=li.length?li[0][1].s||1:1;
-      $('#gr').innerHTML=li.length
-        ?`<div class="resumo">${tn} pausa${tn>1?'s':''}, ${fmt(ts)} no total</div>`+li.map(([k,v])=>`<div class="lin"><span class="lb">${esc(k)}</span><span class="barra"><i style="width:${Math.max(2,v.s/mx*100)}%"></i></span><span class="vl">${fmt(v.s)} <small>(${v.n}x)</small></span></div>`).join('')
-        :'<div class="vazio">Nenhuma pausa neste dia.</div>';
-    }
-    function gmod(m){
-      AGR=m;
-      $('#g1').setAttribute('aria-pressed',m==='motivo');
-      $('#g2').setAttribute('aria-pressed',m==='nome');
-      if(D)grafico(Math.floor((Date.now()-T0)/1000));
-    }
-
-    function fill(s,h){if(s.dataset.h===h)return;const v=s.value;s.innerHTML=h;s.value=v;s.dataset.h=h}
-    const cel=(t,c)=>t[c]
-      ?`<input type="time" step="1" value="${t[c]}" onchange="setT(${t.id},'${c}',this.value)">`
-      :`<button onclick="setT(${t.id},'${c}')">Marcar</button>`;
-
-    function render(){
-      
-      T0=Date.now();TICK=dia()===D.hoje;
-      $('#tot').textContent='Total de pessoas: '+D.turnos.length;
-
-      $('#exp').href='/exportar?data='+dia();
-
-      $('#tt').innerHTML=D.turnos.length
-
-        ?'<tr class="cab"><th>Operador</th><th>Processo</th><th>Entrada</th><th>Saída almoço</th><th>Volta almoço</th><th>Saída final</th><th>Pausas</th><th>Trabalhado</th><th></th></tr>'
-          +D.turnos.map(t=>`<tr><td data-l="Operador"><button class="lk" title="Ver as pausas" onclick="abrir(${t.id})">${esc(t.nome)}</button></td><td data-l="Processo">${esc(t.processo)}</td>${C.map(c=>`<td data-l="${L[c]}">${cel(t,c)}</td>`).join('')}<td data-l="Pausas">${tk(t.pau,rt(t).pau)}</td><td data-l="Trabalhado"><b>${tk(t.trab,rt(t).trab)}</b></td><td><button class="x" title="Apagar" onclick="del('turno',${t.id})">✕</button></td></tr>`).join('')
-        :'<tr><td class="vazio">Nenhuma entrada neste dia. Preencha o operador e o processo acima.</td></tr>';
-      const lim=D.alerta_min*60;
-
-      $('#tp').innerHTML=D.pausas.length
-        ?'<tr class="cab"><th>Operador</th><th>Processo</th><th>OP / peça</th><th>Início</th><th>Fim</th><th>Duração</th><th>Motivo</th><th></th></tr>'
-          +[...D.pausas].sort((a,b)=>(a.fim?1:0)-(b.fim?1:0)).map(p=>`<tr class="${p.fim?'':p.dur>=lim?'estouro':'aberta'}"><td data-l="Operador"><button class="lk" title="Ver as pausas" onclick="abrir(${p.turno_id})">${esc(p.nome)}</button></td><td data-l="Processo">${esc(p.processo)}</td><td data-l="OP / peça">${esc(p.os)}</td><td data-l="Início"><input type="time" step="1" value="${p.inicio}" onchange="setP(${p.id},'inicio',this.value)"></td><td data-l="Fim">${p.fim?`<input type="time" step="1" value="${p.fim}" onchange="setP(${p.id},'fim',this.value)">`:`<button onclick="setP(${p.id},'fim')">Fechar pausa</button>`}</td><td class="dur" data-l="Duração">${p.fim?fmt(p.dur):tk(p.dur,1,' data-open')}</td><td data-l="Motivo">${esc(p.motivo)}</td><td><button class="x" title="Apagar" onclick="del('pausa',${p.id})">✕</button></td></tr>`).join('')
-        :'<tr><td class="vazio">Nenhuma pausa neste dia.</td></tr>';
-
-      aviso(0);
-      grafico(0);
-      if($('#dlg').open)modal();
-
-      fill($('#pt'),'<option value="">Escolha o operador</option>'+D.turnos.map(t=>`<option value="${t.id}">${esc(t.nome)} (${esc(t.processo)})</option>`).join(''));
-
-      fill($('#pm'),'<option value="">Escolha o motivo</option>'+[...D.motivos,'Outro'].map(m=>`<option>${esc(m)}</option>`).join(''));
-
-    }
-
-    async function novoTurno(){
-
-      await api('/api/turno','POST',{data:dia(),nome:$('#nome').value,processo:$('#proc').value,hora:$('#hent').value});
-
-      ['#nome','#proc','#hent'].forEach(s=>$(s).value='');
-
-      load();
-    }
-
-    const setT=async(id,campo,hora)=>{await api('/api/turno/'+id,'POST',hora===undefined?{campo}:{campo,hora});load()};
-    async function novaPausa(){
-
-      if(!$('#pt').value)return alert('Escolha o operador da pausa.');
-
-      const m=$('#pm').value==='Outro'?$('#pot').value:$('#pm').value;
-
-      await api('/api/pausa','POST',{turno_id:+$('#pt').value,os:$('#pos').value,motivo:m,hora:$('#phi').value});
-      ['#pos','#pot','#phi','#pt','#pm'].forEach(s=>$(s).value='');$('#po').hidden=true;
-
-      load();
-    }
-
-    const setP=async(id,campo,hora)=>{await api('/api/pausa/'+id,'POST',hora===undefined?{campo}:{campo,hora});load()};
-    const del=async(k,id)=>{if(confirm('Apagar este registro?')){await api('/api/'+k+'/'+id,'DELETE');load()}};
-    $('#dia').onchange=()=>load();
-    $('#dlg').onclick=e=>{if(e.target===e.currentTarget)fechar()};
-    $('#dlg').onclose=()=>{ABERTO=null};
-    load();
-    setInterval(()=>{if(!document.hidden)load(true)},2000);
-    setInterval(tick,1000);
-    document.onvisibilitychange=()=>{if(!document.hidden)load(true)};
-
-  </script> --!>
+  
 </body>
+
 </html>
